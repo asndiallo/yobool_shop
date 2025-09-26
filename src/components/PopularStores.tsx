@@ -235,7 +235,7 @@ const getCountryColor = (country: string): string => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 20,
+    paddingVertical: 8,
   },
   singleRowHeader: {
     flexDirection: 'row',

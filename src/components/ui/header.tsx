@@ -92,7 +92,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     opacity: 0.6,
-    marginTop: 4,
   },
   rightElement: {
     marginLeft: 12,

@@ -54,6 +54,7 @@ export const en = {
   'home.brand': 'YoBool',
   'home.tagline':
     'Get products from anywhere in the world, delivered to you by trusted travelers',
+  'home.globalShipping': 'Worldwide Delivery',
   'home.customRequest': 'Custom Request',
   'home.customRequestPlaceholder': 'Paste your Amazon/Nike/Zara link here',
   'home.requestQuote': 'Request a Quote',

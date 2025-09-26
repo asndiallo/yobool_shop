@@ -13,7 +13,6 @@ import { router } from 'expo-router';
 import { ThemedView } from '@/components/themed-view';
 import {
   Button,
-  Heading4,
   Heading3,
   BodySmall,
   Caption,
@@ -174,7 +173,24 @@ const YoBoolHomeScreen: React.FC = () => {
         </ThemedView>
       </ThemedView>
 
-      <Heading4 style={styles.headerTitle}>{t('home.tagline')}</Heading4>
+      <ThemedView style={styles.taglineContainer}>
+        <ThemedView style={styles.taglineContent}>
+          <BodySmall style={[styles.taglineText, { color: textColor }]}>
+            {t('home.tagline')}
+          </BodySmall>
+          <ThemedView style={styles.taglineHighlight}>
+            <IconSymbol
+              name="globe"
+              size={16}
+              color={Colors.primary}
+              style={styles.taglineIcon}
+            />
+            <Caption style={[styles.taglineAccent, { color: Colors.primary }]}>
+              {t('home.globalShipping')}
+            </Caption>
+          </ThemedView>
+        </ThemedView>
+      </ThemedView>
 
       <Pills
         items={[
@@ -389,8 +405,43 @@ const styles = StyleSheet.create({
   headerTitle: {
     marginBottom: 20,
   },
+  taglineContainer: {
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
+  taglineContent: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  taglineText: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+    marginBottom: 12,
+    fontWeight: '500',
+    opacity: 0.9,
+  },
+  taglineHighlight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  taglineIcon: {
+    opacity: 0.8,
+  },
+  taglineAccent: {
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
   productsSection: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   productsGrid: {
     flexDirection: 'row',
