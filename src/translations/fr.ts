@@ -29,6 +29,7 @@ export const fr = {
   'common.search': 'Rechercher',
   'common.filter': 'Filtrer',
   'common.sort': 'Trier',
+  'common.seeAll': 'Voir tout',
 
   // Errors
   'error.network': 'Erreur réseau',
@@ -66,6 +67,14 @@ export const fr = {
   'categories.clothing': 'Vêtements',
   'categories.home': 'Maison',
   'categories.accessories': 'Accessoires',
+
+  // Stores
+  'stores.popularStores': 'Boutiques populaires',
+  'stores.discoverProducts': 'Découvrez des milliers de produits',
+  'stores.topShops': 'Meilleures boutiques',
+  'stores.electronics': 'Électronique',
+  'stores.fashionBeauty': 'Mode & Beauté',
+  'stores.shoesSports': 'Chaussures & Sport',
 
   // Trust Badges
   'trust.registeredCompany': 'Entreprise enregistrée au Sénégal',

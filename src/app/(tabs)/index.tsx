@@ -22,6 +22,7 @@ import { BorderRadius, Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/useTranslation';
+import PopularStores from '@/components/PopularStores';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -311,6 +312,17 @@ const YoBoolHomeScreen: React.FC = () => {
           )}
         </ThemedView>
       </ThemedView>
+
+      <PopularStores
+        onStorePress={(store) => {
+          // Open store URL or navigate to store products
+          console.log('Navigate to store:', store.website_url);
+        }}
+        onCategoryPress={(categoryId) => {
+          // Navigate to category page with all stores
+          console.log('Navigate to category:', categoryId);
+        }}
+      />
 
       {renderCustomRequest()}
       {renderTrustBadges()}

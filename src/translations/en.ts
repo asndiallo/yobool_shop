@@ -29,6 +29,7 @@ export const en = {
   'common.search': 'Search',
   'common.filter': 'Filter',
   'common.sort': 'Sort',
+  'common.seeAll': 'See All',
 
   // Errors
   'error.network': 'Network error',
@@ -66,6 +67,14 @@ export const en = {
   'categories.clothing': 'Clothing',
   'categories.home': 'Home',
   'categories.accessories': 'Accessories',
+
+  // Stores
+  'stores.popularStores': 'Popular Stores',
+  'stores.discoverProducts': 'Découvrez des milliers de produits',
+  'stores.topShops': 'Top Shops',
+  'stores.electronics': 'Electronics',
+  'stores.fashionBeauty': 'Fashion & Beauty',
+  'stores.shoesSports': 'SHoes & Sports',
 
   // Trust Badges
   'trust.registeredCompany': 'Company registered in Senegal',
