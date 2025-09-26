@@ -49,6 +49,27 @@ export const en = {
   'settings.privacy': 'Privacy',
   'settings.about': 'About',
 
+  // Home Screen
+  'home.brand': 'YoBool',
+  'home.tagline':
+    'Get products from anywhere in the world, delivered to you by trusted travelers',
+  'home.customRequest': 'Custom Request',
+  'home.customRequestPlaceholder': 'Paste your Amazon/Nike/Zara link here',
+  'home.requestQuote': 'Request a Quote',
+  'home.priceFrom': 'From {price} {currency}',
+  'home.order': 'Order',
+
+  // Categories
+  'categories.fashion': 'Fashion',
+  'categories.electronics': 'Electronics',
+  'categories.beauty': 'Beauty',
+  'categories.clothing': 'Clothing',
+  'categories.home': 'Home',
+  'categories.accessories': 'Accessories',
+
+  // Trust Badges
+  'trust.registeredCompany': 'Company registered in Senegal',
+  'trust.securePayment': 'Secure Wave payment',
 } as const;
 
 export type TranslationKey = keyof typeof en;

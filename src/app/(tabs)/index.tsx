@@ -11,9 +11,17 @@ import {
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol, type IconSymbolName } from '@/components/ui/icon-symbol';
+import {
+  Button,
+  Heading4,
+  IconSymbol,
+  Pills,
+  type IconSymbolName,
+} from '@/components/ui';
+import { BorderRadius, Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -40,29 +48,15 @@ interface Category {
   icon: IconSymbolName;
 }
 
-// Color configuration - easy to modify
-const Colors = {
-  primary: '#F4B942', // Golden yellow for primary actions
-  primaryLight: '#FFF8E7', // Light background for primary elements
-  secondary: '#8B7DD8', // Purple for secondary actions
-  secondaryLight: '#F3F1FF', // Light background for secondary elements
-  navy: '#2C3E50', // Navy for primary buttons
-  success: '#27AE60',
-  warning: '#F39C12',
-  danger: '#E74C3C',
-  lightGray: '#F8F9FA',
-  mediumGray: '#E9ECEF',
-  darkGray: '#6C757D',
-};
-
 const categories: Category[] = [
-  { id: '1', name: 'Vêtements', icon: 'house.fill' },
-  { id: '2', name: 'Électronique', icon: 'paperplane.fill' },
-  { id: '3', name: 'Maison', icon: 'house.fill' },
-  { id: '4', name: 'Accessoires', icon: 'paperplane.fill' },
+  { id: '1', name: 'clothing', icon: 'house.fill' },
+  { id: '2', name: 'electronics', icon: 'paperplane.fill' },
+  { id: '3', name: 'home', icon: 'house.fill' },
+  { id: '4', name: 'accessories', icon: 'paperplane.fill' },
 ];
 
 const YoBoolHomeScreen: React.FC = () => {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -145,12 +139,16 @@ const YoBoolHomeScreen: React.FC = () => {
       <ThemedView style={styles.headerTop}>
         <ThemedView style={styles.logoContainer}>
           <ThemedText style={[styles.logo, { color: Colors.primary }]}>
-            YoBool
+            {t('home.brand')}
           </ThemedText>
         </ThemedView>
         <ThemedView style={styles.headerIcons}>
           <Pressable style={styles.notificationButton}>
-            <IconSymbol name="bell.fill" size={24} color={Colors.darkGray} />
+            <IconSymbol
+              name="bell.fill"
+              size={24}
+              color={Colors.neutral.gray[500]}
+            />
             <ThemedView
               style={[
                 styles.notificationBadge,
@@ -171,54 +169,18 @@ const YoBoolHomeScreen: React.FC = () => {
         </ThemedView>
       </ThemedView>
 
-      <ThemedText style={styles.headerTitle}>
-        Achetez aux États-Unis & Europe, livré au Sénégal
-      </ThemedText>
+      <Heading4 style={styles.headerTitle}>{t('home.tagline')}</Heading4>
 
-      <ThemedView style={styles.categoriesGrid}>
-        <Pressable
-          style={[styles.categoryButton, { backgroundColor: Colors.primary }]}
-          onPress={() => handleCategoryPress(categories[0])}
-        >
-          <ThemedText style={styles.categoryButtonText}>
-            Mode/Fashion
-          </ThemedText>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.categoryButton,
-            styles.categoryButtonOutline,
-            { borderColor: Colors.darkGray },
-          ]}
-          onPress={() => handleCategoryPress(categories[1])}
-        >
-          <ThemedText
-            style={[
-              styles.categoryButtonTextOutline,
-              { color: Colors.darkGray },
-            ]}
-          >
-            Électronique
-          </ThemedText>
-        </Pressable>
-        <Pressable
-          style={[
-            styles.categoryButton,
-            styles.categoryButtonOutline,
-            { borderColor: Colors.secondary },
-          ]}
-          onPress={() => handleCategoryPress(categories[2])}
-        >
-          <ThemedText
-            style={[
-              styles.categoryButtonTextOutline,
-              { color: Colors.secondary },
-            ]}
-          >
-            Beauté
-          </ThemedText>
-        </Pressable>
-      </ThemedView>
+      <Pills
+        items={[
+          { id: '1', label: t('categories.fashion'), isActive: true },
+          { id: '2', label: t('categories.electronics'), isActive: false },
+          { id: '3', label: t('categories.beauty'), isActive: false },
+        ]}
+        onItemPress={(id) =>
+          handleCategoryPress(categories.find((c) => c.id === id)!)
+        }
+      />
     </ThemedView>
   );
 
@@ -227,7 +189,7 @@ const YoBoolHomeScreen: React.FC = () => {
       key={product.id}
       style={({ pressed }) => [
         styles.productCard,
-        { backgroundColor: colorScheme === 'dark' ? '#1f1f1f' : '#ffffff' },
+        { backgroundColor: Colors[colorScheme].backgroundSecondary },
         { opacity: pressed ? 0.8 : 1 },
       ]}
       onPress={() => handleProductPress(product)}
@@ -236,39 +198,42 @@ const YoBoolHomeScreen: React.FC = () => {
       <ThemedView style={styles.productContent}>
         <ThemedText style={styles.productName}>{product.name}</ThemedText>
         <ThemedText style={[styles.productPrice, { color: textColor }]}>
-          À partir de {product.price.toLocaleString()} {product.currency}
+          {t('home.priceFrom')
+            .replace('{price}', product.price.toLocaleString())
+            .replace('{currency}', product.currency)}
         </ThemedText>
-        <Pressable
-          style={[
-            styles.orderButton,
-            { backgroundColor: index === 0 ? Colors.navy : Colors.primary },
-          ]}
+        <Button
+          variant={'ghost'}
+          size="sm"
           onPress={() => orderProduct(product)}
         >
-          <ThemedText style={styles.orderButtonText}>Commander</ThemedText>
-        </Pressable>
+          {t('home.order')}
+        </Button>
       </ThemedView>
     </Pressable>
   );
 
   const renderCustomRequest = () => (
     <ThemedView style={styles.customRequestSection}>
-      <ThemedText style={styles.sectionTitle}>Demande Personnalisée</ThemedText>
+      <ThemedText style={styles.sectionTitle}>
+        {t('home.customRequest')}
+      </ThemedText>
 
       <ThemedView
         style={[
           styles.searchContainer,
-          {
-            backgroundColor:
-              colorScheme === 'dark' ? '#2f2f2f' : Colors.lightGray,
-          },
+          { backgroundColor: Colors[colorScheme].backgroundSecondary },
         ]}
       >
-        <IconSymbol name="paperplane.fill" size={20} color={Colors.darkGray} />
+        <IconSymbol
+          name="paperplane.fill"
+          size={20}
+          color={Colors.neutral.gray[500]}
+        />
         <TextInput
           style={[styles.searchInput, { color: textColor }]}
-          placeholder="Collez votre lien Amazon/Nike/Zara ici"
-          placeholderTextColor={Colors.darkGray}
+          placeholder={t('home.customRequestPlaceholder')}
+          placeholderTextColor={Colors.neutral.gray[500]}
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -280,33 +245,30 @@ const YoBoolHomeScreen: React.FC = () => {
             key={category.id}
             style={[
               styles.categoryIcon,
-              {
-                backgroundColor:
-                  colorScheme === 'dark' ? '#2f2f2f' : Colors.lightGray,
-              },
+              { backgroundColor: Colors[colorScheme].backgroundSecondary },
             ]}
             onPress={() => handleCategoryPress(category)}
           >
             <IconSymbol
               name={category.icon}
               size={24}
-              color={Colors.darkGray}
+              color={Colors.neutral.gray[500]}
             />
             <ThemedText style={styles.categoryIconText}>
-              {category.name}
+              {t(`categories.${category.name}` as any)}
             </ThemedText>
           </Pressable>
         ))}
       </ThemedView>
 
-      <Pressable
-        style={[styles.requestButton, { backgroundColor: Colors.primary }]}
+      <Button
+        variant="primary"
+        size="lg"
+        style={styles.requestButton}
         onPress={handleCustomRequest}
       >
-        <ThemedText style={styles.requestButtonText}>
-          Demander un devis
-        </ThemedText>
-      </Pressable>
+        {t('home.requestQuote')}
+      </Button>
     </ThemedView>
   );
 
@@ -315,27 +277,21 @@ const YoBoolHomeScreen: React.FC = () => {
       <ThemedView
         style={[
           styles.trustBadge,
-          {
-            backgroundColor:
-              colorScheme === 'dark' ? '#2f2f2f' : Colors.lightGray,
-          },
+          { backgroundColor: Colors[colorScheme].backgroundSecondary },
         ]}
       >
-        <ThemedText style={[styles.trustBadgeText, { color: Colors.navy }]}>
-          Entreprise enregistrée au Sénégal
+        <ThemedText style={[styles.trustBadgeText, { color: Colors.warning }]}>
+          {t('trust.registeredCompany')}
         </ThemedText>
       </ThemedView>
       <ThemedView
         style={[
           styles.trustBadge,
-          {
-            backgroundColor:
-              colorScheme === 'dark' ? '#2f2f2f' : Colors.primaryLight,
-          },
+          { backgroundColor: Colors[colorScheme].backgroundSecondary },
         ]}
       >
         <ThemedText style={[styles.trustBadgeText, { color: Colors.warning }]}>
-          Paiement sécurisé Wave
+          {t('trust.securePayment')}
         </ThemedText>
       </ThemedView>
     </ThemedView>
@@ -349,9 +305,11 @@ const YoBoolHomeScreen: React.FC = () => {
       {renderHeader()}
 
       <ThemedView style={styles.productsSection}>
-        {featuredProducts.map((product, index) =>
-          renderProductCard(product, index)
-        )}
+        <ThemedView style={styles.productsGrid}>
+          {featuredProducts.map((product, index) =>
+            renderProductCard(product, index)
+          )}
+        </ThemedView>
       </ThemedView>
 
       {renderCustomRequest()}
@@ -414,39 +372,19 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    lineHeight: 36,
     marginBottom: 20,
-  },
-  categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  categoryButtonOutline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-  },
-  categoryButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  categoryButtonTextOutline: {
-    fontSize: 14,
-    fontWeight: '600',
   },
   productsSection: {
     padding: 20,
-    gap: 20,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
   },
   productCard: {
+    width: (SCREEN_WIDTH - 52) / 2, // Account for padding and gap
     borderRadius: 16,
     overflow: 'hidden',
     elevation: 3,
@@ -457,30 +395,21 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '100%',
-    height: 200,
+    height: 140,
     backgroundColor: '#f0f0f0',
   },
   productContent: {
-    padding: 16,
+    padding: 12,
   },
   productName: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 6,
+    height: 36, // Fixed height to align content
   },
   productPrice: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  orderButton: {
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  orderButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 12,
+    marginBottom: 10,
   },
   customRequestSection: {
     padding: 20,
@@ -522,14 +451,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   requestButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  requestButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    borderRadius: BorderRadius.lg,
   },
   trustBadges: {
     flexDirection: 'row',

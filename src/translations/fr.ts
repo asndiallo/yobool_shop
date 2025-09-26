@@ -48,4 +48,26 @@ export const fr = {
   'settings.notifications': 'Notifications',
   'settings.privacy': 'Confidentialité',
   'settings.about': 'À propos',
+
+  // Home Screen
+  'home.brand': 'YoBool',
+  'home.tagline':
+    'Obtenez des produits de partout dans le monde, livrés à vous par des voyageurs de confiance',
+  'home.customRequest': 'Demande Personnalisée',
+  'home.customRequestPlaceholder': 'Collez votre lien Amazon/Nike/Zara ici',
+  'home.requestQuote': 'Demander un devis',
+  'home.priceFrom': 'À partir de {price} {currency}',
+  'home.order': 'Commander',
+
+  // Categories
+  'categories.fashion': 'Mode/Fashion',
+  'categories.electronics': 'Électronique',
+  'categories.beauty': 'Beauté',
+  'categories.clothing': 'Vêtements',
+  'categories.home': 'Maison',
+  'categories.accessories': 'Accessoires',
+
+  // Trust Badges
+  'trust.registeredCompany': 'Entreprise enregistrée au Sénégal',
+  'trust.securePayment': 'Paiement sécurisé Wave',
 } as const;
