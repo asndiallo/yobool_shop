@@ -56,7 +56,8 @@ export const en = {
     'Get products from anywhere in the world, delivered to you by trusted travelers',
   'home.globalShipping': 'Worldwide Delivery',
   'home.customRequest': 'Custom Request',
-  'home.customRequestDescription': "Can't find what you're looking for? Let us source it for you from anywhere in the world.",
+  'home.customRequestDescription':
+    "Can't find what you're looking for? Let us source it for you from anywhere in the world.",
   'home.startOrder': "I'm ready to start my order",
   'home.customRequestPlaceholder': 'Paste your Amazon/Nike/Zara link here',
   'home.requestQuote': 'Request a Quote',
@@ -76,7 +77,6 @@ export const en = {
   'order.productUrlSubtitle': 'Paste any product link and get a custom quote',
   'order.manualEntry': 'Enter info manually',
   'order.manualEntrySubtitle': 'Describe your product requirements in detail',
-  'home.priceFrom': 'From {price} {currency}',
   'home.order': 'Order',
   'home.orderDirectlyOnline': 'Order Directly Online',
 

@@ -24,6 +24,7 @@ import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/useTranslation';
+import { formatPrice, formatPriceFrom } from '@/utils';
 import PopularStores from '@/components/PopularStores';
 import type { Store } from '@/data/stores';
 
@@ -60,7 +61,7 @@ const categories: Category[] = [
 ];
 
 const YoBoolHomeScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -138,9 +139,11 @@ const YoBoolHomeScreen: React.FC = () => {
   const handleProductPress = (product: Product) => {
     Alert.alert(
       product.name,
-      `Prix: ${product.price.toLocaleString()} ${
-        product.currency
-      }\n\nVoulez-vous commander ce produit?`,
+      `Prix: ${formatPrice(
+        product.price,
+        product.currency,
+        i18n.language
+      )}\n\nVoulez-vous commander ce produit?`,
       [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Commander', onPress: () => orderProduct(product) },
@@ -237,9 +240,7 @@ const YoBoolHomeScreen: React.FC = () => {
       <ThemedView style={styles.productContent}>
         <BodySmall style={styles.productName}>{product.name}</BodySmall>
         <Caption style={[styles.productPrice, { color: textColor }]}>
-          {t('home.priceFrom')
-            .replace('{price}', product.price.toLocaleString())
-            .replace('{currency}', product.currency)}
+          {formatPriceFrom(product.price, product.currency, i18n.language)}
         </Caption>
         <Button
           variant={'ghost'}
@@ -303,12 +304,6 @@ const YoBoolHomeScreen: React.FC = () => {
           style={styles.startOrderButton}
           onPress={() => router.push('/order-options')}
         >
-          <IconSymbol
-            name="plus"
-            size={20}
-            color="#ffffff"
-            style={styles.startOrderIcon}
-          />
           {t('home.startOrder')}
         </Button>
       </View>

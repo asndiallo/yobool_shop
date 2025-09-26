@@ -58,7 +58,7 @@ export const fr = {
   'home.customRequest': 'Demande Personnalisée',
   'home.customRequestDescription':
     "Vous ne trouvez pas ce que vous cherchez ? Laissez-nous le sourcer pour vous depuis n'importe où dans le monde.",
-  'home.startOrder': 'Je suis prêt à passer ma commande',
+  'home.startOrder': 'Prêt à passer ma commande',
   'home.customRequestPlaceholder': 'Collez votre lien Amazon/Nike/Zara ici',
   'home.requestQuote': 'Demander un devis',
   'home.globalSourcing': 'Approvisionnement mondial',
@@ -78,7 +78,6 @@ export const fr = {
     'Collez un lien produit et obtenez un devis personnalisé',
   'order.manualEntry': 'Saisir les infos manuellement',
   'order.manualEntrySubtitle': 'Décrivez vos exigences produit en détail',
-  'home.priceFrom': 'À partir de {price} {currency}',
   'home.order': 'Commander',
   'home.orderDirectlyOnline': 'Commander directement en ligne',
 
