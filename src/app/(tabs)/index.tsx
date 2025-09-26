@@ -6,7 +6,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  TextInput,
+  View,
 } from 'react-native';
 import { router } from 'expo-router';
 
@@ -20,7 +20,7 @@ import {
   Pills,
   type IconSymbolName,
 } from '@/components/ui';
-import { BorderRadius, Colors } from '@/constants/theme';
+import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -66,7 +66,6 @@ const YoBoolHomeScreen: React.FC = () => {
   const textColor = useThemeColor({}, 'text');
 
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [searchText, setSearchText] = useState('');
   const [, setLoading] = useState(false);
 
   useEffect(() => {
@@ -103,8 +102,31 @@ const YoBoolHomeScreen: React.FC = () => {
           category: { name: 'Mode' },
           availability: { is_active: true, can_be_ordered: true },
         },
+        {
+          id: '3',
+          name: 'MacBook Pro 14"',
+          description: 'Latest Apple laptop',
+          external_url: 'https://apple.com/macbook-pro',
+          image_url:
+            'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=300&h=300&fit=crop',
+          price: 1250000,
+          currency: 'XOF',
+          category: { name: 'Electronics' },
+          availability: { is_active: true, can_be_ordered: true },
+        },
+        {
+          id: '4',
+          name: 'AirPods Pro',
+          description: 'Wireless earphones',
+          external_url: 'https://apple.com/airpods-pro',
+          image_url:
+            'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=300&h=300&fit=crop',
+          price: 150000,
+          currency: 'XOF',
+          category: { name: 'Electronics' },
+          availability: { is_active: true, can_be_ordered: true },
+        },
       ];
-
       setFeaturedProducts(mockProducts);
     } catch (error) {
       console.error('Error loading products:', error);
@@ -128,10 +150,6 @@ const YoBoolHomeScreen: React.FC = () => {
 
   const orderProduct = (product: Product) => {
     console.log('Ordering product:', product.name);
-  };
-
-  const handleCustomRequest = () => {
-    console.log('Opening custom request form');
   };
 
   const handleCategoryPress = (category: Category) => {
@@ -178,7 +196,7 @@ const YoBoolHomeScreen: React.FC = () => {
           <BodySmall style={[styles.taglineText, { color: textColor }]}>
             {t('home.tagline')}
           </BodySmall>
-          <ThemedView style={styles.taglineHighlight}>
+          <View style={styles.taglineHighlight}>
             <IconSymbol
               name="globe"
               size={16}
@@ -188,7 +206,7 @@ const YoBoolHomeScreen: React.FC = () => {
             <Caption style={[styles.taglineAccent, { color: Colors.primary }]}>
               {t('home.globalShipping')}
             </Caption>
-          </ThemedView>
+          </View>
         </ThemedView>
       </ThemedView>
 
@@ -236,64 +254,70 @@ const YoBoolHomeScreen: React.FC = () => {
 
   const renderCustomRequest = () => (
     <ThemedView style={styles.customRequestSection}>
-      <Heading3 style={styles.sectionTitle}>{t('home.customRequest')}</Heading3>
-
-      <ThemedView
-        style={[
-          styles.searchContainer,
-          { backgroundColor: Colors[colorScheme].backgroundSecondary },
-        ]}
-      >
-        <IconSymbol
-          name="paperplane.fill"
-          size={20}
-          color={Colors.neutral.gray[500]}
-        />
-        <TextInput
-          style={[styles.searchInput, { color: textColor }]}
-          placeholder={t('home.customRequestPlaceholder')}
-          placeholderTextColor={Colors.neutral.gray[500]}
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-      </ThemedView>
-
-      <ThemedView style={styles.categoryIconsGrid}>
-        {categories.map((category) => (
-          <Pressable
-            key={category.id}
-            style={[
-              styles.categoryIcon,
-              { backgroundColor: Colors[colorScheme].backgroundSecondary },
-            ]}
-            onPress={() => handleCategoryPress(category)}
+      <View style={styles.customRequestCard}>
+        <View style={styles.customRequestHeader}>
+          <IconSymbol
+            name="sparkles"
+            size={32}
+            color={Colors.primary}
+            style={styles.customRequestIcon}
+          />
+          <Heading3 style={[styles.sectionTitle, { color: textColor }]}>
+            {t('home.customRequest')}
+          </Heading3>
+          <BodySmall
+            style={[styles.customRequestDescription, { color: textColor }]}
           >
-            <IconSymbol
-              name={category.icon}
-              size={24}
-              color={Colors.neutral.gray[500]}
-            />
-            <Caption style={styles.categoryIconText}>
-              {t(`categories.${category.name}` as any)}
-            </Caption>
-          </Pressable>
-        ))}
-      </ThemedView>
+            {t('home.customRequestDescription')}
+          </BodySmall>
+        </View>
 
-      <Button
-        variant="primary"
-        size="lg"
-        style={styles.requestButton}
-        onPress={handleCustomRequest}
-      >
-        {t('home.requestQuote')}
-      </Button>
+        <View style={styles.customRequestFeatures}>
+          <View style={styles.featureItem}>
+            <IconSymbol name="globe" size={16} color={Colors.primary} />
+            <Caption style={[styles.featureText, { color: textColor }]}>
+              {t('home.globalSourcing')}
+            </Caption>
+          </View>
+          <View style={styles.featureItem}>
+            <IconSymbol
+              name="checkmark.circle"
+              size={16}
+              color={Colors.success}
+            />
+            <Caption style={[styles.featureText, { color: textColor }]}>
+              {t('home.qualityGuaranteed')}
+            </Caption>
+          </View>
+          <View style={styles.featureItem}>
+            <IconSymbol name="bolt" size={16} color={Colors.warning} />
+            <Caption style={[styles.featureText, { color: textColor }]}>
+              {t('home.fastDelivery')}
+            </Caption>
+          </View>
+        </View>
+
+        <Button
+          variant="primary"
+          size="lg"
+          style={styles.startOrderButton}
+          onPress={() => router.push('/order-options')}
+        >
+          <IconSymbol
+            name="plus"
+            size={20}
+            color="#ffffff"
+            style={styles.startOrderIcon}
+          />
+          {t('home.startOrder')}
+        </Button>
+      </View>
     </ThemedView>
   );
 
   const renderTrustBadges = () => (
     <ThemedView style={styles.trustBadges}>
-      <ThemedView
+      <View
         style={[
           styles.trustBadge,
           { backgroundColor: Colors[colorScheme].backgroundSecondary },
@@ -302,8 +326,8 @@ const YoBoolHomeScreen: React.FC = () => {
         <Caption style={[styles.trustBadgeText, { color: Colors.warning }]}>
           {t('trust.registeredCompany')}
         </Caption>
-      </ThemedView>
-      <ThemedView
+      </View>
+      <View
         style={[
           styles.trustBadge,
           { backgroundColor: Colors[colorScheme].backgroundSecondary },
@@ -312,7 +336,7 @@ const YoBoolHomeScreen: React.FC = () => {
         <Caption style={[styles.trustBadgeText, { color: Colors.warning }]}>
           {t('trust.securePayment')}
         </Caption>
-      </ThemedView>
+      </View>
     </ThemedView>
   );
 
@@ -378,7 +402,7 @@ const styles = StyleSheet.create({
   },
   notificationButton: {
     position: 'relative',
-    padding: 4,
+    padding: Spacing.xs,
   },
   notificationBadge: {
     position: 'absolute',
@@ -406,13 +430,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   taglineContainer: {
-    marginBottom: 24,
-    paddingHorizontal: 4,
+    marginBottom: Spacing['2xl'],
+    paddingHorizontal: Spacing.xs,
   },
   taglineContent: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
-    padding: 16,
+    padding: Spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
@@ -453,11 +477,7 @@ const styles = StyleSheet.create({
     width: (SCREEN_WIDTH - 52) / 2, // Account for padding and gap
     borderRadius: 16,
     overflow: 'hidden',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    ...Shadows.md,
   },
   productImage: {
     width: '100%',
@@ -480,54 +500,74 @@ const styles = StyleSheet.create({
   customRequestSection: {
     padding: 20,
   },
+  customRequestCard: {
+    backgroundColor: 'rgba(244, 185, 66, 0.05)',
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(244, 185, 66, 0.2)',
+    padding: Spacing['2xl'],
+    ...Shadows.md,
+  },
+  customRequestHeader: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
+  },
+  customRequestIcon: {
+    marginBottom: Spacing.md,
+    opacity: 0.9,
+  },
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-    gap: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    padding: 0,
-  },
-  categoryIconsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    gap: 12,
-  },
-  categoryIcon: {
-    width: (SCREEN_WIDTH - 64) / 2,
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 12,
-    gap: 8,
-  },
-  categoryIconText: {
+  customRequestDescription: {
+    textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 20,
     fontSize: 14,
-    fontWeight: '500',
+    paddingHorizontal: Spacing.sm,
   },
-  requestButton: {
+  customRequestFeatures: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: Spacing['2xl'],
+    paddingHorizontal: Spacing.sm,
+  },
+  featureItem: {
+    alignItems: 'center',
+    flex: 1,
+    paddingVertical: Spacing.sm,
+  },
+  featureText: {
+    marginTop: Spacing.xs,
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  startOrderButton: {
     borderRadius: BorderRadius.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    minHeight: 56,
+    ...Shadows.lg,
+  },
+  startOrderIcon: {
+    marginRight: Spacing.xs,
   },
   trustBadges: {
     flexDirection: 'row',
     gap: 8,
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingBottom: Spacing['4xl'],
   },
   trustBadge: {
     flex: 1,
-    padding: 8,
+    padding: Spacing.sm,
     borderRadius: 6,
     alignItems: 'center',
   },

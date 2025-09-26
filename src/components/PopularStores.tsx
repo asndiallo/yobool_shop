@@ -10,7 +10,7 @@ import {
   Caption,
   Heading4,
 } from '@/components/ui';
-import { Colors } from '@/constants/theme';
+import { Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { STORES_DATA, type Store, type StoreCategory } from '@/data/stores';
@@ -235,25 +235,25 @@ const getCountryColor = (country: string): string => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
   singleRowHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   sectionTitle: {
     paddingHorizontal: 20,
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   sectionSubtitle: {
     paddingHorizontal: 20,
     marginBottom: 20,
   },
   categoryContainer: {
-    marginBottom: 24,
+    marginBottom: Spacing['2xl'],
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -287,11 +287,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
+    ...Shadows.sm,
   },
   logoContainer: {
     width: 60,
@@ -300,12 +296,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    marginBottom: Spacing.sm,
+    ...Shadows.sm,
   },
   storeLogo: {
     width: 40,
@@ -314,7 +306,7 @@ const styles = StyleSheet.create({
   },
   storeName: {
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
     height: 32, // Fixed height for alignment
   },
   countryBadge: {

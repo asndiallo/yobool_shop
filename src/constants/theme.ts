@@ -89,6 +89,13 @@ export const Spacing = {
   '6xl': 64,
 } as const;
 
+// Opacity Scale - Consistent transparency levels
+export const Opacity = {
+  disabled: 0.3,
+  secondary: 0.6,
+  primary: 1,
+} as const;
+
 // Typography Scale - Consistent text sizes and styles
 export const Typography = {
   fontSize: {

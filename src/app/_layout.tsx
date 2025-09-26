@@ -25,10 +25,7 @@ export default function RootLayout() {
           name="stores"
           options={{ headerShown: false, title: 'All Stores' }}
         />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: 'modal', title: 'Modal' }}
-        />
+        <Stack.Screen name="order-options" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

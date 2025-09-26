@@ -1,4 +1,5 @@
 import { BodySmall, Heading4 } from '@/components/ui/typography';
+import { Opacity, Spacing } from '@/constants/theme';
 import { Pressable, StyleSheet } from 'react-native';
 
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   backButton: {
-    padding: 8,
+    padding: Spacing.sm,
     marginLeft: -8,
   },
   titleContainer: {
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   subtitle: {
-    opacity: 0.6,
+    opacity: Opacity.secondary,
   },
   rightElement: {
     marginLeft: 12,

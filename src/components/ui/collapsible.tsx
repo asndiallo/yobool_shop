@@ -1,7 +1,7 @@
+import { Colors, Spacing } from '@/constants/theme';
 import { Pressable, StyleSheet } from 'react-native';
 import { PropsWithChildren, useState } from 'react';
 
-import { Colors } from '@/constants/theme';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
   },
   content: {
     marginTop: 6,
-    marginLeft: 24,
+    marginLeft: Spacing['2xl'],
   },
 });

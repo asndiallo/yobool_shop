@@ -6,6 +6,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { PropsWithChildren, ReactElement } from 'react';
 
+import { Spacing } from '@/constants/theme';
 import { StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: Spacing['3xl'],
+    gap: Spacing.lg,
     overflow: 'hidden',
   },
 });
