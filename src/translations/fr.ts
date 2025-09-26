@@ -59,6 +59,7 @@ export const fr = {
   'home.requestQuote': 'Demander un devis',
   'home.priceFrom': 'À partir de {price} {currency}',
   'home.order': 'Commander',
+  'home.orderDirectlyOnline': 'Commander directement en ligne',
 
   // Categories
   'categories.fashion': 'Mode/Fashion',
@@ -71,6 +72,8 @@ export const fr = {
   // Stores
   'stores.popularStores': 'Boutiques populaires',
   'stores.discoverProducts': 'Découvrez des milliers de produits',
+  'stores.allStores': 'Toutes les boutiques',
+  'stores.browseByCategory': 'Parcourir par catégorie',
   'stores.topShops': 'Meilleures boutiques',
   'stores.electronics': 'Électronique',
   'stores.fashionBeauty': 'Mode & Beauté',

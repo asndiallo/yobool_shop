@@ -59,6 +59,7 @@ export const en = {
   'home.requestQuote': 'Request a Quote',
   'home.priceFrom': 'From {price} {currency}',
   'home.order': 'Order',
+  'home.orderDirectlyOnline': 'Order Directly Online',
 
   // Categories
   'categories.fashion': 'Fashion',
@@ -70,11 +71,13 @@ export const en = {
 
   // Stores
   'stores.popularStores': 'Popular Stores',
-  'stores.discoverProducts': 'Découvrez des milliers de produits',
+  'stores.discoverProducts': 'Discover thousands of products',
+  'stores.allStores': 'All Stores',
+  'stores.browseByCategory': 'Browse stores by category',
   'stores.topShops': 'Top Shops',
   'stores.electronics': 'Electronics',
   'stores.fashionBeauty': 'Fashion & Beauty',
-  'stores.shoesSports': 'SHoes & Sports',
+  'stores.shoesSports': 'Shoes & Sports',
 
   // Trust Badges
   'trust.registeredCompany': 'Company registered in Senegal',

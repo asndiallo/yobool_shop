@@ -8,12 +8,15 @@ import {
   StyleSheet,
   TextInput,
 } from 'react-native';
+import { router } from 'expo-router';
 
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import {
   Button,
   Heading4,
+  Heading3,
+  BodySmall,
+  Caption,
   IconSymbol,
   Pills,
   type IconSymbolName,
@@ -23,6 +26,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/useTranslation';
 import PopularStores from '@/components/PopularStores';
+import type { Store } from '@/data/stores';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -139,9 +143,9 @@ const YoBoolHomeScreen: React.FC = () => {
     <ThemedView style={styles.header}>
       <ThemedView style={styles.headerTop}>
         <ThemedView style={styles.logoContainer}>
-          <ThemedText style={[styles.logo, { color: Colors.primary }]}>
+          <Heading3 style={[styles.logo, { color: Colors.primary }]}>
             {t('home.brand')}
-          </ThemedText>
+          </Heading3>
         </ThemedView>
         <ThemedView style={styles.headerIcons}>
           <Pressable style={styles.notificationButton}>
@@ -156,7 +160,7 @@ const YoBoolHomeScreen: React.FC = () => {
                 { backgroundColor: Colors.danger },
               ]}
             >
-              <ThemedText style={styles.badgeText}>2</ThemedText>
+              <Caption style={styles.badgeText}>2</Caption>
             </ThemedView>
           </Pressable>
           <Pressable>
@@ -197,12 +201,12 @@ const YoBoolHomeScreen: React.FC = () => {
     >
       <Image source={{ uri: product.image_url }} style={styles.productImage} />
       <ThemedView style={styles.productContent}>
-        <ThemedText style={styles.productName}>{product.name}</ThemedText>
-        <ThemedText style={[styles.productPrice, { color: textColor }]}>
+        <BodySmall style={styles.productName}>{product.name}</BodySmall>
+        <Caption style={[styles.productPrice, { color: textColor }]}>
           {t('home.priceFrom')
             .replace('{price}', product.price.toLocaleString())
             .replace('{currency}', product.currency)}
-        </ThemedText>
+        </Caption>
         <Button
           variant={'ghost'}
           size="sm"
@@ -216,9 +220,7 @@ const YoBoolHomeScreen: React.FC = () => {
 
   const renderCustomRequest = () => (
     <ThemedView style={styles.customRequestSection}>
-      <ThemedText style={styles.sectionTitle}>
-        {t('home.customRequest')}
-      </ThemedText>
+      <Heading3 style={styles.sectionTitle}>{t('home.customRequest')}</Heading3>
 
       <ThemedView
         style={[
@@ -255,9 +257,9 @@ const YoBoolHomeScreen: React.FC = () => {
               size={24}
               color={Colors.neutral.gray[500]}
             />
-            <ThemedText style={styles.categoryIconText}>
+            <Caption style={styles.categoryIconText}>
               {t(`categories.${category.name}` as any)}
-            </ThemedText>
+            </Caption>
           </Pressable>
         ))}
       </ThemedView>
@@ -281,9 +283,9 @@ const YoBoolHomeScreen: React.FC = () => {
           { backgroundColor: Colors[colorScheme].backgroundSecondary },
         ]}
       >
-        <ThemedText style={[styles.trustBadgeText, { color: Colors.warning }]}>
+        <Caption style={[styles.trustBadgeText, { color: Colors.warning }]}>
           {t('trust.registeredCompany')}
-        </ThemedText>
+        </Caption>
       </ThemedView>
       <ThemedView
         style={[
@@ -291,9 +293,9 @@ const YoBoolHomeScreen: React.FC = () => {
           { backgroundColor: Colors[colorScheme].backgroundSecondary },
         ]}
       >
-        <ThemedText style={[styles.trustBadgeText, { color: Colors.warning }]}>
+        <Caption style={[styles.trustBadgeText, { color: Colors.warning }]}>
           {t('trust.securePayment')}
-        </ThemedText>
+        </Caption>
       </ThemedView>
     </ThemedView>
   );
@@ -314,13 +316,14 @@ const YoBoolHomeScreen: React.FC = () => {
       </ThemedView>
 
       <PopularStores
-        onStorePress={(store) => {
+        showSingleRow
+        onStorePress={(store: Store) => {
           // Open store URL or navigate to store products
           console.log('Navigate to store:', store.website_url);
         }}
-        onCategoryPress={(categoryId) => {
-          // Navigate to category page with all stores
-          console.log('Navigate to category:', categoryId);
+        onSeeAllPress={() => {
+          // Navigate to all stores screen
+          router.push('/stores');
         }}
       />
 

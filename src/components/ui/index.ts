@@ -2,6 +2,7 @@
 export { Button, type ButtonSize, type ButtonVariant } from './button';
 export { Card, type CardVariant } from './card';
 export { Collapsible } from './collapsible';
+export { Header } from './header';
 export { IconSymbol, type IconSymbolName } from './icon-symbol';
 export { Pills } from './pills';
 export {

@@ -1,8 +1,15 @@
 import React from 'react';
 import { StyleSheet, ScrollView, Pressable, Image, View } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui';
+import {
+  IconSymbol,
+  Button,
+  BodySmall,
+  Heading3,
+  Overline,
+  Caption,
+  Heading4,
+} from '@/components/ui';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -31,9 +38,9 @@ const StoreCard: React.FC<StoreCardProps> = ({ store, onPress }) => {
       <View style={styles.logoContainer}>
         <Image source={{ uri: store.logo_url }} style={styles.storeLogo} />
       </View>
-      <ThemedText style={styles.storeName} numberOfLines={2}>
+      <Caption style={styles.storeName} numberOfLines={2}>
         {store.name}
-      </ThemedText>
+      </Caption>
       {store.country && (
         <View
           style={[
@@ -41,7 +48,7 @@ const StoreCard: React.FC<StoreCardProps> = ({ store, onPress }) => {
             { backgroundColor: getCountryColor(store.country) },
           ]}
         >
-          <ThemedText style={styles.countryText}>{store.country}</ThemedText>
+          <Caption style={styles.countryText}>{store.country}</Caption>
         </View>
       )}
     </Pressable>
@@ -70,14 +77,14 @@ const StoreCategoryRow: React.FC<StoreCategoryRowProps> = ({
             size={20}
             color={Colors.primary}
           />
-          <ThemedText style={styles.categoryName}>
+          <Heading4 style={styles.categoryName}>
             {t(category.name_key as TranslationKey)}
-          </ThemedText>
+          </Heading4>
         </ThemedView>
         <Pressable onPress={() => onSeeAllPress(category.id)}>
-          <ThemedText style={[styles.seeAllText, { color: Colors.primary }]}>
+          <BodySmall style={[styles.seeAllText, { color: Colors.primary }]}>
             {t('common.seeAll')}
-          </ThemedText>
+          </BodySmall>
         </Pressable>
       </ThemedView>
 
@@ -97,36 +104,108 @@ const StoreCategoryRow: React.FC<StoreCategoryRowProps> = ({
 
 interface PopularStoresProps {
   onStorePress: (store: Store) => void;
-  onCategoryPress: (categoryId: string) => void;
+  onCategoryPress?: (categoryId: string) => void;
+  onSeeAllPress?: () => void;
+  categoryId?: string; // If provided, show only this category
+  showSingleRow?: boolean; // If true, show only one row for home screen
+  title?: string; // Custom title
+  subtitle?: string; // Custom subtitle
 }
 
 const PopularStores: React.FC<PopularStoresProps> = ({
   onStorePress,
   onCategoryPress,
+  onSeeAllPress,
+  categoryId,
+  showSingleRow = false,
+  title,
+  subtitle,
 }) => {
   const { t } = useTranslation();
 
   const handleStorePress = (store: Store) => {
-    // Track analytics here if needed
     console.log('Store pressed:', store.name);
     onStorePress(store);
   };
 
-  const handleSeeAllPress = (categoryId: string) => {
-    console.log('See all pressed for category:', categoryId);
-    onCategoryPress(categoryId);
+  const handleSeeAllPress = (catId: string) => {
+    console.log('See all pressed for category:', catId);
+    if (onCategoryPress) {
+      onCategoryPress(catId);
+    }
   };
 
+  // Determine which categories to show
+  const categoriesToShow = React.useMemo(() => {
+    if (categoryId) {
+      // Show specific category
+      const category = STORES_DATA.find((cat) => cat.id === categoryId);
+      return category ? [category] : [];
+    } else if (showSingleRow) {
+      // Show only top-shops for home screen
+      const topShopsCategory = STORES_DATA.find(
+        (cat) => cat.id === 'top-shops'
+      );
+      return topShopsCategory ? [topShopsCategory] : [];
+    } else {
+      // Show all categories
+      return STORES_DATA;
+    }
+  }, [categoryId, showSingleRow]);
+
+  if (showSingleRow && categoriesToShow.length > 0) {
+    // Single row layout for home screen
+    const category = categoriesToShow[0];
+    return (
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.singleRowHeader}>
+          <Overline>{title || t('home.orderDirectlyOnline')}</Overline>
+          {onSeeAllPress && (
+            <Button variant="ghost" size="sm" onPress={onSeeAllPress}>
+              {t('common.seeAll')}
+            </Button>
+          )}
+        </ThemedView>
+
+        {subtitle && (
+          <BodySmall style={styles.sectionSubtitle}>{subtitle}</BodySmall>
+        )}
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.storesScrollContainer}
+          style={styles.storesScroll}
+        >
+          {category.stores.map((store) => (
+            <StoreCard
+              key={store.id}
+              store={store}
+              onPress={handleStorePress}
+            />
+          ))}
+        </ScrollView>
+      </ThemedView>
+    );
+  }
+
+  // Multiple categories layout for dedicated screen
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.sectionTitle}>
-        {t('stores.popularStores')}
-      </ThemedText>
-      <ThemedText style={styles.sectionSubtitle}>
-        {t('stores.discoverProducts')}
-      </ThemedText>
+      {(title || (!categoryId && !showSingleRow)) && (
+        <>
+          <Heading3 style={styles.sectionTitle}>
+            {title || t('stores.popularStores')}
+          </Heading3>
+          {(subtitle || (!categoryId && !showSingleRow)) && (
+            <BodySmall style={styles.sectionSubtitle}>
+              {subtitle || t('stores.discoverProducts')}
+            </BodySmall>
+          )}
+        </>
+      )}
 
-      {STORES_DATA.map((category) => (
+      {categoriesToShow.map((category) => (
         <StoreCategoryRow
           key={category.id}
           category={category}
@@ -158,15 +237,18 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 20,
   },
+  singleRowHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 4,
+  },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
     paddingHorizontal: 20,
     marginBottom: 4,
   },
   sectionSubtitle: {
-    fontSize: 14,
-    opacity: 0.6,
     paddingHorizontal: 20,
     marginBottom: 20,
   },
@@ -231,8 +313,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   storeName: {
-    fontSize: 12,
-    fontWeight: '600',
     textAlign: 'center',
     marginBottom: 4,
     height: 32, // Fixed height for alignment
@@ -243,8 +323,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   countryText: {
-    fontSize: 10,
-    fontWeight: 'bold',
     color: '#ffffff',
   },
 });
