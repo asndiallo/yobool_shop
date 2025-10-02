@@ -1,7 +1,7 @@
 import { AuthContextValue, isAuthenticated } from '@/types';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 
-import { useAuthHook } from '@/hooks/useAuthHook';
+import { useAuthHook } from '@/hooks/use-auth';
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 

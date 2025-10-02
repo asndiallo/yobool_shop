@@ -23,9 +23,9 @@ import {
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/use-translation';
 import { formatPrice, formatPriceFrom } from '@/utils';
-import PopularStores from '@/components/PopularStores';
+import PopularStores from '@/components/popular-stores';
 import type { Store } from '@/data/stores';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -183,7 +183,7 @@ const YoBoolHomeScreen: React.FC = () => {
               <Caption style={styles.badgeText}>2</Caption>
             </ThemedView>
           </Pressable>
-          <Pressable>
+          <Pressable onPress={() => router.push('/sign-in')}>
             <Image
               source={{
                 uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',

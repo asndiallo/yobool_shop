@@ -2,4 +2,4 @@
  * Utility functions for YoBool
  */
 
-export * from './formatMoney';
+export * from './format-money';

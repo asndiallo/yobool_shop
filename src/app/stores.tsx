@@ -1,13 +1,13 @@
 import { ScrollView, StyleSheet } from 'react-native';
 
 import { Header } from '@/components/ui';
-import PopularStores from '@/components/PopularStores';
+import PopularStores from '@/components/popular-stores';
 import React from 'react';
 import type { Store } from '@/data/stores';
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/use-translation';
 
 const AllStoresScreen: React.FC = () => {
   const { t } = useTranslation();
