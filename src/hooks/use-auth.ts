@@ -27,7 +27,7 @@ import {
 } from '@/lib/jwt';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useFirstTime } from './useFirstTime';
+import { useFirstTime } from './use-first-time';
 
 // ============================================================================
 // HOOK STATE INTERFACE

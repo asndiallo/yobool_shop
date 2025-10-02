@@ -32,7 +32,7 @@ import {
   shipShoppingOrder,
   updateShoppingOrder,
 } from '@/api/shopping-orders';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================

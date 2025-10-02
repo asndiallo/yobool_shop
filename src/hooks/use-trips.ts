@@ -33,7 +33,7 @@ import {
   startTripTransit,
   updateTrip,
 } from '@/api/trips';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================
@@ -46,7 +46,8 @@ export const tripKeys = {
   list: (params?: QueryParams) => [...tripKeys.lists(), params] as const,
   details: () => [...tripKeys.all, 'detail'] as const,
   detail: (id: EntityId) => [...tripKeys.details(), id] as const,
-  shoppingOrders: (id: EntityId) => [...tripKeys.detail(id), 'shopping_orders'] as const,
+  shoppingOrders: (id: EntityId) =>
+    [...tripKeys.detail(id), 'shopping_orders'] as const,
   quotes: (id: EntityId) => [...tripKeys.detail(id), 'quotes'] as const,
   availableForShopping: (routeId: EntityId) =>
     [...tripKeys.all, 'available_for_shopping', routeId] as const,
@@ -129,7 +130,10 @@ export const useTripQuotes = (id?: EntityId) => {
   });
 };
 
-export const useCheckTripAccommodation = (tripId?: EntityId, orderId?: EntityId) => {
+export const useCheckTripAccommodation = (
+  tripId?: EntityId,
+  orderId?: EntityId
+) => {
   const token = useAuthToken();
 
   return useQuery({
@@ -145,7 +149,9 @@ export const useCheckTripAccommodation = (tripId?: EntityId, orderId?: EntityId)
 // ============================================================================
 
 export const useCreateTrip = (
-  options?: Partial<UseMutationOptions<ApiSingleResponse<Trip>, APIError, TripInput>>
+  options?: Partial<
+    UseMutationOptions<ApiSingleResponse<Trip>, APIError, TripInput>
+  >
 ) => {
   const queryClient = useQueryClient();
   const token = useAuthToken();
@@ -160,7 +166,9 @@ export const useCreateTrip = (
 };
 
 export const useCreateRoundTrip = (
-  options?: Partial<UseMutationOptions<ApiArrayResponse<Trip>, APIError, RoundTripInput>>
+  options?: Partial<
+    UseMutationOptions<ApiArrayResponse<Trip>, APIError, RoundTripInput>
+  >
 ) => {
   const queryClient = useQueryClient();
   const token = useAuthToken();
@@ -225,7 +233,9 @@ const createTransitionHook = (
       onSuccess: (response, id) => {
         queryClient.setQueryData(tripKeys.detail(id), response);
         queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-        queryClient.invalidateQueries({ queryKey: tripKeys.shoppingOrders(id) });
+        queryClient.invalidateQueries({
+          queryKey: tripKeys.shoppingOrders(id),
+        });
       },
     });
   };

@@ -24,7 +24,7 @@ import {
   updateReview,
   voteOnReview,
 } from '@/api/reviews';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================

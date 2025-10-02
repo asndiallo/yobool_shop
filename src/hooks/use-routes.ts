@@ -10,7 +10,7 @@ import {
   isAuthenticated,
 } from '@/types';
 import { findOrCreateRoute } from '@/api/routes';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================

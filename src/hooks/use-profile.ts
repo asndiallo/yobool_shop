@@ -13,7 +13,7 @@ import {
   isAuthenticated,
 } from '@/types';
 import { deleteProfileAvatar, getProfile, updateProfile } from '@/api/profile';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================

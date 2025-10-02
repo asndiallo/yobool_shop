@@ -25,7 +25,7 @@ import {
   registerDevice,
   unregisterDevice,
 } from '@/api/notifications';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================

@@ -21,7 +21,7 @@ import {
   rejectQuote,
   updateQuote,
 } from '@/api/quotes';
-import { useAuthHook } from './useAuthHook';
+import { useAuthHook } from './use-auth';
 import { APIError } from '@/api/errors';
 
 // ============================================================================
