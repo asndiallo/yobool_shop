@@ -13,6 +13,26 @@ export const fr = {
   'auth.email': 'Email',
   'auth.password': 'Mot de passe',
   'auth.rememberMe': 'Se souvenir de moi',
+  'auth.welcomeBack': 'Bon Retour',
+  'auth.signInToContinue': 'Connectez-vous pour continuer vos achats',
+  'auth.createAccount': 'Créer un Compte',
+  'auth.joinYobool':
+    'Rejoignez YoBool et faites du shopping partout dans le monde',
+  'auth.continueWithGoogle': 'Continuer avec Google',
+  'auth.continueWithApple': 'Continuer avec Apple',
+  'auth.orContinueWith': 'Ou continuer avec',
+  'auth.dontHaveAccount': "Vous n'avez pas de compte?",
+  'auth.alreadyHaveAccount': 'Vous avez déjà un compte?',
+  'auth.signUpLink': "S'inscrire",
+  'auth.signInLink': 'Se connecter',
+  'auth.emailPlaceholder': 'Entrez votre email',
+  'auth.passwordPlaceholder': 'Entrez votre mot de passe',
+  'auth.confirmPasswordPlaceholder': 'Confirmez votre mot de passe',
+  'auth.passwordMismatch': 'Les mots de passe ne correspondent pas',
+  'auth.invalidEmail': 'Veuillez entrer un email valide',
+  'auth.passwordTooShort':
+    'Le mot de passe doit contenir au moins 8 caractères',
+  'auth.fieldRequired': 'Ce champ est requis',
 
   // Common/General
   'common.loading': 'Chargement...',
