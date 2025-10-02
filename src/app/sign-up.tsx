@@ -26,6 +26,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { authStyles } from '@/styles/auth.styles';
 import { GoogleAuthButton, AppleAuthButton } from '@/components/auth';
+import { useCallback } from 'react';
 
 // Configure WebBrowser for optimal OAuth experience
 WebBrowser.maybeCompleteAuthSession();
@@ -84,7 +85,7 @@ export default function SignUpScreen() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     try {
       const url = await initiateGoogleAuth();
 
@@ -106,9 +107,9 @@ export default function SignUpScreen() {
     } catch (error) {
       console.error('Google sign in error:', error);
     }
-  };
+  }, [initiateGoogleAuth, exchangeOauthToken]);
 
-  const handleAppleSignIn = async () => {
+  const handleAppleSignIn = useCallback(async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -137,7 +138,7 @@ export default function SignUpScreen() {
       }
       console.error('Apple sign in error:', error);
     }
-  };
+  }, [signInWithApple]);
 
   const handleSignInPress = () => {
     router.push('/sign-in');

@@ -203,4 +203,12 @@ export const fr = {
   'profile.noChangesMessage': "Vous n'avez effectué aucune modification",
   'profile.profileUpdated': 'Profil mis à jour avec succès',
   'profile.updateFailed': 'Échec de la mise à jour du profil',
+  'profile.upcomingTrips': 'Voyages à venir',
+  'profile.reviews': 'avis',
+  'profile.users': 'utilisateurs',
+  'profile.birthday': 'Anniversaire',
+  'profile.referrals': 'Parrainages',
+  'profile.canAcceptBookings': 'Peut accepter des réservations',
+  'profile.yourReferralCode': 'Votre code de parrainage',
+  'profile.referralCode': 'Code de parrainage',
 } as const;

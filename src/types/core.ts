@@ -180,35 +180,72 @@ export interface RouteInput {
 
 export interface User {
   readonly id: UserId;
-  readonly type: 'profile' | 'mini_profile';
+  readonly type: 'user' | 'profile' | 'mini_profile';
   readonly attributes: UserAttributes;
+  readonly relationships?: UserRelationships;
 }
 
 export interface UserAttributes {
+  // Core identity
   readonly first_name: string;
   readonly last_name: string;
-  readonly email: string;
-  readonly bio?: string;
-  readonly phone_number?: string;
+  readonly full_name: string;
   readonly avatar_url: string | null;
-  readonly currency: Currency;
-  readonly locale: Locale;
-  readonly country: string;
+  readonly bio?: string;
   readonly role: UserRole;
+
+  // Contact & Location
+  readonly email?: string; // Only in ProfileSerializer
+  readonly phone_number?: string; // Only in ProfileSerializer
+  readonly country: string;
+
+  // Trust & Verification
   readonly verified_at: string | null;
+  readonly is_verified: boolean;
+  readonly yobool_score: number;
+  readonly successful_deliveries: number;
+  readonly average_rating: number | null;
+  readonly reviews_count: number;
+
+  // Preferences (ProfileSerializer only)
+  readonly currency: Currency;
+  readonly locale?: Locale; // Only in ProfileSerializer
+  readonly timezone?: string; // Only in ProfileSerializer
+  readonly measurement_system?: 'metric' | 'imperial'; // Only in ProfileSerializer
+
+  // Profile status
   readonly profile_complete: boolean;
-  readonly push_token: string | null;
-  readonly yobool_score?: number;
-  readonly successful_deliveries?: number;
-  readonly average_rating?: number;
-  readonly reviews_count?: number;
-  readonly stripe_account_status?: string | null;
-  readonly stripe_login_link?: string | null;
-  readonly wave_account_verified_at?: string | null;
-  readonly wave_phone_number?: string | null;
-  readonly birthday: string | null;
-  readonly created_at: string;
-  readonly updated_at: string;
+  readonly member_since: string; // Date ISO string
+
+  // Stripe integration
+  readonly can_accept_bookings: boolean;
+  readonly stripe_account_status?: string | null; // Only in ProfileSerializer
+  readonly stripe_login_link?: string | null; // Only in ProfileSerializer
+
+  // Referral system (ProfileSerializer only)
+  readonly referral_code?: string;
+  readonly referred_users_count?: number;
+
+  // Notifications (ProfileSerializer only)
+  readonly unread_notifications_count?: number;
+  readonly push_token?: string | null;
+
+  // Additional metadata
+  readonly birthday?: string | null; // Only in ProfileSerializer
+  readonly created_at?: string;
+  readonly updated_at?: string;
+}
+
+export interface UserRelationships {
+  readonly addresses?: {
+    readonly data: { readonly id: EntityId; readonly type: 'address' }[];
+  };
+  readonly reviews?: {
+    readonly data: { readonly id: EntityId; readonly type: 'review' }[];
+  };
+  readonly trips?: {
+    readonly data: { readonly id: EntityId; readonly type: 'trip' }[];
+  };
 }
 
 // ============================================================================

@@ -197,6 +197,14 @@ export const en = {
   'profile.noChangesMessage': 'You have not made any changes',
   'profile.profileUpdated': 'Profile updated successfully',
   'profile.updateFailed': 'Failed to update profile',
+  'profile.upcomingTrips': 'Upcoming Trips',
+  'profile.reviews': 'reviews',
+  'profile.users': 'users',
+  'profile.birthday': 'Birthday',
+  'profile.referrals': 'Referrals',
+  'profile.canAcceptBookings': 'Can Accept Bookings',
+  'profile.yourReferralCode': 'Your Referral Code',
+  'profile.referralCode': 'Referral Code',
 } as const;
 
 export type TranslationKey = keyof typeof en;
