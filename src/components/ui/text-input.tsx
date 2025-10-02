@@ -11,7 +11,7 @@ import { IconSymbol, type IconSymbolName } from '@/components/ui/icon-symbol';
 import { BorderRadius, Colors, Spacing, Typography } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
-interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
+export interface TextInputProps extends Omit<RNTextInputProps, 'style'> {
   label?: string;
   error?: string;
   helperText?: string;
