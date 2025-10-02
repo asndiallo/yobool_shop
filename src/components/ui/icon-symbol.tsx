@@ -22,6 +22,13 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'bell.fill': 'notifications',
+  envelope: 'email',
+  lock: 'lock',
+  'g.circle.fill': 'g-translate', // or another suitable Google icon
+  'apple.logo': 'apple',
+  eye: 'visibility',
+  'eye.slash': 'visibility-off',
+  'chevron.left': 'chevron-left',
 } as IconMapping;
 
 /**

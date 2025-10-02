@@ -5,6 +5,7 @@ export { Collapsible } from './collapsible';
 export { Header } from './header';
 export { IconSymbol, type IconSymbolName } from './icon-symbol';
 export { Pills } from './pills';
+export { TextInput } from './text-input';
 export {
   Body,
   BodySmall,
