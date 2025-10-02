@@ -8,6 +8,7 @@ export type TypographyVariant =
   | 'h2'
   | 'h3'
   | 'h4'
+  | 'h5'
   | 'body'
   | 'bodySmall'
   | 'caption'
@@ -66,6 +67,12 @@ export function Text({
         return {
           fontSize: TypographyTokens.fontSize['2xl'],
           lineHeight: TypographyTokens.lineHeight['2xl'],
+          fontWeight: TypographyTokens.fontWeight.semiBold,
+        };
+      case 'h5':
+        return {
+          fontSize: TypographyTokens.fontSize.xl,
+          lineHeight: TypographyTokens.lineHeight.xl,
           fontWeight: TypographyTokens.fontWeight.semiBold,
         };
       case 'body':
@@ -152,6 +159,10 @@ export const Heading3 = (props: Omit<TypographyProps, 'variant'>) => (
 
 export const Heading4 = (props: Omit<TypographyProps, 'variant'>) => (
   <Text variant="h4" {...props} />
+);
+
+export const Heading5 = (props: Omit<TypographyProps, 'variant'>) => (
+  <Text variant="h5" {...props} />
 );
 
 export const Body = (props: Omit<TypographyProps, 'variant'>) => (

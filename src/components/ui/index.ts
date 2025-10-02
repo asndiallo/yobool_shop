@@ -15,6 +15,7 @@ export {
   Heading2,
   Heading3,
   Heading4,
+  Heading5,
   Overline,
   Text,
   type TypographyColor,
