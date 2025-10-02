@@ -167,9 +167,9 @@ export function formatTokenExpiry(
 
 export function getRedirectUrl(): string {
   if (__DEV__) {
-    return 'yobool://auth/callback';
+    return 'yoboolshop://auth/callback';
   }
-  return 'yobool://auth/callback';
+  return 'yoboolshop://auth/callback';
 }
 
 export function parseOAuthCallback(url: string): Record<string, string> {

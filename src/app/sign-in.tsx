@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -26,7 +25,9 @@ import { signInSchema, type SignInFormData } from '@/schemas/auth.schema';
 import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { authStyles } from '@/styles/auth.styles';
-import { useEffect, useState } from 'react';
+import { GoogleAuthButton, AppleAuthButton } from '@/components/auth';
+import { useCallback } from 'react';
+import { getRedirectUrl } from '@/lib/jwt';
 
 // Configure WebBrowser for optimal OAuth experience
 WebBrowser.maybeCompleteAuthSession();
@@ -43,7 +44,6 @@ export default function SignInScreen() {
     isLoadingGoogle,
     isLoadingApple,
   } = useAuthHook();
-  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 
   const {
     control,
@@ -57,17 +57,6 @@ export default function SignInScreen() {
       password: '',
     },
   });
-
-  // Check Apple Authentication availability
-  useEffect(() => {
-    const checkAppleAuth = async () => {
-      if (Platform.OS === 'ios') {
-        const available = await AppleAuthentication.isAvailableAsync();
-        setIsAppleAvailable(available);
-      }
-    };
-    checkAppleAuth();
-  }, []);
 
   const isLoading =
     authState.status === 'loading' ||
@@ -92,14 +81,18 @@ export default function SignInScreen() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     try {
       const url = await initiateGoogleAuth();
 
       // Open OAuth URL with expo-web-browser
-      const result = await WebBrowser.openAuthSessionAsync(url, undefined, {
-        showInRecents: true,
-      });
+      const result = await WebBrowser.openAuthSessionAsync(
+        url,
+        getRedirectUrl(),
+        {
+          showInRecents: true,
+        }
+      );
 
       if (result.type === 'success' && result.url) {
         // Extract the authorization code from the callback URL
@@ -114,9 +107,9 @@ export default function SignInScreen() {
     } catch (error) {
       console.error('Google sign in error:', error);
     }
-  };
+  }, [initiateGoogleAuth, exchangeOauthToken]);
 
-  const handleAppleSignIn = async () => {
+  const handleAppleSignIn = useCallback(async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
@@ -145,7 +138,7 @@ export default function SignInScreen() {
       }
       console.error('Apple sign in error:', error);
     }
-  };
+  }, [signInWithApple]);
 
   const handleSignUpPress = () => {
     router.push('/sign-up');
@@ -238,39 +231,13 @@ export default function SignInScreen() {
 
           {/* Social Sign In Buttons */}
           <ThemedView style={authStyles.socialButtonsContainer}>
-            <Pressable
-              style={[authStyles.socialButton, { borderColor }]}
+            <GoogleAuthButton
               onPress={handleGoogleSignIn}
               disabled={isLoading}
-            >
-              {isLoadingGoogle ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                <>
-                  <Image
-                    source={require('@/assets/icons/google.png')}
-                    style={authStyles.socialButtonIcon}
-                  />
-                  <BodySmall style={authStyles.socialButtonText}>
-                    {t('auth.continueWithGoogle')}
-                  </BodySmall>
-                </>
-              )}
-            </Pressable>
+              isLoading={isLoadingGoogle}
+            />
 
-            {Platform.OS === 'ios' && isAppleAvailable && (
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                }
-                buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                }
-                cornerRadius={8}
-                style={{ width: '100%', height: 52 }}
-                onPress={handleAppleSignIn}
-              />
-            )}
+            <AppleAuthButton onPress={handleAppleSignIn} />
           </ThemedView>
 
           {/* Sign Up Link */}

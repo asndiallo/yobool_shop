@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -26,7 +25,7 @@ import { signUpSchema, type SignUpFormData } from '@/schemas/auth.schema';
 import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { authStyles } from '@/styles/auth.styles';
-import { useEffect, useState } from 'react';
+import { GoogleAuthButton, AppleAuthButton } from '@/components/auth';
 
 // Configure WebBrowser for optimal OAuth experience
 WebBrowser.maybeCompleteAuthSession();
@@ -43,7 +42,6 @@ export default function SignUpScreen() {
     isLoadingGoogle,
     isLoadingApple,
   } = useAuthHook();
-  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 
   const {
     control,
@@ -58,17 +56,6 @@ export default function SignUpScreen() {
       confirmPassword: '',
     },
   });
-
-  // Check Apple Authentication availability
-  useEffect(() => {
-    const checkAppleAuth = async () => {
-      if (Platform.OS === 'ios') {
-        const available = await AppleAuthentication.isAvailableAsync();
-        setIsAppleAvailable(available);
-      }
-    };
-    checkAppleAuth();
-  }, []);
 
   const isLoading =
     authState.status === 'loading' ||
@@ -243,39 +230,13 @@ export default function SignUpScreen() {
 
           {/* Social Sign In Buttons */}
           <ThemedView style={authStyles.socialButtonsContainer}>
-            <Pressable
-              style={[authStyles.socialButton, { borderColor }]}
+            <GoogleAuthButton
               onPress={handleGoogleSignIn}
               disabled={isLoading}
-            >
-              {isLoadingGoogle ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                <>
-                  <Image
-                    source={require('@/assets/icons/google.png')}
-                    style={authStyles.socialButtonIcon}
-                  />
-                  <BodySmall style={authStyles.socialButtonText}>
-                    {t('auth.continueWithGoogle')}
-                  </BodySmall>
-                </>
-              )}
-            </Pressable>
+              isLoading={isLoadingGoogle}
+            />
 
-            {Platform.OS === 'ios' && isAppleAvailable && (
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                }
-                buttonStyle={
-                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                }
-                cornerRadius={8}
-                style={{ width: '100%', height: 52 }}
-                onPress={handleAppleSignIn}
-              />
-            )}
+            <AppleAuthButton onPress={handleAppleSignIn} />
           </ThemedView>
 
           {/* Sign In Link */}
