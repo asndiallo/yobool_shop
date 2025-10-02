@@ -88,19 +88,31 @@ export function onLocaleChange(listener: LocaleChangeListener): () => void {
 }
 
 /**
- * Translate a key to current locale with fallback
+ * Translate a key to current locale with fallback and interpolation support
+ * @param key - Translation key
+ * @param params - Optional parameters for interpolation (e.g., { min: '8' })
  */
-export function t(key: TranslationKey): string {
+export function t(
+  key: TranslationKey,
+  params?: Record<string, string>
+): string {
   const translation = translations[currentLocale]?.[key];
-  if (translation) return translation;
+  let result: string =
+    translation || translations[i18nConfig.fallbackLocale]?.[key] || key;
 
-  // Fallback to default locale
-  const fallback = translations[i18nConfig.fallbackLocale]?.[key];
-  if (fallback) return fallback;
+  if (!translation && !translations[i18nConfig.fallbackLocale]?.[key]) {
+    console.warn(`Missing translation for key: ${key}`);
+    return key;
+  }
 
-  // Return key if no translation found
-  console.warn(`Missing translation for key: ${key}`);
-  return key;
+  // Interpolate parameters if provided
+  if (params) {
+    Object.entries(params).forEach(([paramKey, value]) => {
+      result = result.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), value);
+    });
+  }
+
+  return result;
 }
 
 // ============================================================================
