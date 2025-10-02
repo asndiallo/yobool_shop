@@ -12,7 +12,7 @@ import {
 } from '@/components/ui';
 import { Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/use-translation';
 import { STORES_DATA, type Store, type StoreCategory } from '@/data/stores';
 import type { TranslationKey } from '@/translations';
 
