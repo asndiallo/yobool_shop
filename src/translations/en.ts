@@ -36,6 +36,7 @@ export const en = {
   // Common/General
   'common.loading': 'Loading...',
   'common.save': 'Save',
+  'common.saving': 'Saving...',
   'common.cancel': 'Cancel',
   'common.ok': 'OK',
   'common.yes': 'Yes',
@@ -49,6 +50,8 @@ export const en = {
   'common.filter': 'Filter',
   'common.sort': 'Sort',
   'common.seeAll': 'See All',
+  'common.error': 'Error',
+  'common.goBack': 'Go Back',
 
   // Errors
   'error.network': 'Network error',
@@ -56,6 +59,8 @@ export const en = {
   'error.validation': 'Please check your input',
   'error.auth.invalidCredentials': 'Invalid credentials',
   'error.auth.sessionExpired': 'Session expired',
+  'auth.notAuthenticated': 'You need to be signed in',
+  'auth.signIn': 'Sign In',
 
   // Validation
   'validation.required': 'This field is required',
@@ -70,6 +75,12 @@ export const en = {
     'Password must contain at least one lowercase letter',
   'validation.passwordNumber': 'Password must contain at least one number',
   'validation.passwordMismatch': 'Passwords do not match',
+  'validation.firstNameRequired': 'First name is required',
+  'validation.lastNameRequired': 'Last name is required',
+  'validation.firstNameMinLength': 'First name must be at least 2 characters',
+  'validation.lastNameMinLength': 'Last name must be at least 2 characters',
+  'validation.phoneInvalid': 'Please enter a valid phone number',
+  'validation.countryRequired': 'Country is required',
 
   // Navigation
   'nav.home': 'Home',
@@ -134,6 +145,58 @@ export const en = {
   // Trust Badges
   'trust.registeredCompany': 'Company registered in Senegal',
   'trust.securePayment': 'Secure Wave payment',
+
+  // Profile
+  'profile.title': 'Profile',
+  'profile.myProfile': 'My Profile',
+  'profile.editProfile': 'Edit Profile',
+  'profile.settings': 'Settings',
+  'profile.score': 'YoBool Score',
+  'profile.deliveries': 'Deliveries',
+  'profile.rating': 'Rating',
+  'profile.email': 'Email',
+  'profile.phone': 'Phone',
+  'profile.country': 'Country',
+  'profile.memberSince': 'Member Since',
+  'profile.information': 'Information',
+  'profile.bio': 'Bio',
+  'profile.noBio': 'No bio added yet',
+  'profile.verified': 'Verified',
+  'profile.message': 'Message',
+  'profile.report': 'Report User',
+  'profile.contact': 'Contact',
+  'profile.contactUser': 'Contact this user',
+  'profile.reportUser': 'Report this user',
+  'profile.loadError': 'Failed to load profile',
+  'profile.notSet': 'Not set',
+  'profile.permissions': 'Permission Required',
+  'profile.permissionsMessage':
+    'We need permission to access your photos to update your avatar',
+  'profile.changeAvatar': 'Change Avatar',
+  'profile.choosePhoto': 'Choose Photo',
+  'profile.removePhoto': 'Remove Photo',
+  'profile.deleteAvatar': 'Delete Avatar',
+  'profile.deleteAvatarConfirm': 'Are you sure you want to delete your avatar?',
+  'profile.success': 'Success',
+  'profile.avatarUpdated': 'Avatar updated successfully',
+  'profile.avatarUpdateFailed': 'Failed to update avatar',
+  'profile.avatarDeleted': 'Avatar deleted successfully',
+  'profile.avatarDeleteFailed': 'Failed to delete avatar',
+  'profile.personalInfo': 'Personal Information',
+  'profile.contactInfo': 'Contact Information',
+  'profile.firstName': 'First Name',
+  'profile.lastName': 'Last Name',
+  'profile.firstNamePlaceholder': 'Enter your first name',
+  'profile.lastNamePlaceholder': 'Enter your last name',
+  'profile.bioPlaceholder': 'Tell us about yourself...',
+  'profile.phonePlaceholder': '+221 77 123 45 67',
+  'profile.countryPlaceholder': 'Enter your country',
+  'profile.accountSettingsNote':
+    'To change your email or password, go to Account Settings',
+  'profile.noChanges': 'No Changes',
+  'profile.noChangesMessage': 'You have not made any changes',
+  'profile.profileUpdated': 'Profile updated successfully',
+  'profile.updateFailed': 'Failed to update profile',
 } as const;
 
 export type TranslationKey = keyof typeof en;

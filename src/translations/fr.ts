@@ -37,6 +37,7 @@ export const fr = {
   // Common/General
   'common.loading': 'Chargement...',
   'common.save': 'Enregistrer',
+  'common.saving': 'Enregistrement...',
   'common.cancel': 'Annuler',
   'common.ok': 'OK',
   'common.yes': 'Oui',
@@ -50,6 +51,8 @@ export const fr = {
   'common.filter': 'Filtrer',
   'common.sort': 'Trier',
   'common.seeAll': 'Voir tout',
+  'common.error': 'Erreur',
+  'common.goBack': 'Retour',
 
   // Errors
   'error.network': 'Erreur réseau',
@@ -57,6 +60,8 @@ export const fr = {
   'error.validation': 'Veuillez vérifier votre saisie',
   'error.auth.invalidCredentials': 'Identifiants invalides',
   'error.auth.sessionExpired': 'Session expirée',
+  'auth.notAuthenticated': 'Vous devez être connecté',
+  'auth.signIn': 'Se connecter',
 
   // Validation
   'validation.required': 'Ce champ est requis',
@@ -73,6 +78,13 @@ export const fr = {
   'validation.passwordNumber':
     'Le mot de passe doit contenir au moins un chiffre',
   'validation.passwordMismatch': 'Les mots de passe ne correspondent pas',
+  'validation.firstNameRequired': 'Le prénom est requis',
+  'validation.lastNameRequired': 'Le nom est requis',
+  'validation.firstNameMinLength':
+    'Le prénom doit contenir au moins 2 caractères',
+  'validation.lastNameMinLength': 'Le nom doit contenir au moins 2 caractères',
+  'validation.phoneInvalid': 'Veuillez entrer un numéro de téléphone valide',
+  'validation.countryRequired': 'Le pays est requis',
 
   // Navigation
   'nav.home': 'Accueil',
@@ -138,4 +150,57 @@ export const fr = {
   // Trust Badges
   'trust.registeredCompany': 'Entreprise enregistrée au Sénégal',
   'trust.securePayment': 'Paiement sécurisé Wave',
+
+  // Profile
+  'profile.title': 'Profil',
+  'profile.myProfile': 'Mon Profil',
+  'profile.editProfile': 'Modifier le Profil',
+  'profile.settings': 'Paramètres',
+  'profile.score': 'Score YoBool',
+  'profile.deliveries': 'Livraisons',
+  'profile.rating': 'Note',
+  'profile.email': 'Email',
+  'profile.phone': 'Téléphone',
+  'profile.country': 'Pays',
+  'profile.memberSince': 'Membre depuis',
+  'profile.information': 'Informations',
+  'profile.bio': 'Bio',
+  'profile.noBio': 'Aucune bio ajoutée',
+  'profile.verified': 'Vérifié',
+  'profile.message': 'Message',
+  'profile.report': 'Signaler',
+  'profile.contact': 'Contact',
+  'profile.contactUser': 'Contacter cet utilisateur',
+  'profile.reportUser': 'Signaler cet utilisateur',
+  'profile.loadError': 'Échec du chargement du profil',
+  'profile.notSet': 'Non défini',
+  'profile.permissions': 'Permission Requise',
+  'profile.permissionsMessage':
+    "Nous avons besoin de l'autorisation d'accéder à vos photos pour mettre à jour votre avatar",
+  'profile.changeAvatar': "Changer l'Avatar",
+  'profile.choosePhoto': 'Choisir une Photo',
+  'profile.removePhoto': 'Supprimer la Photo',
+  'profile.deleteAvatar': "Supprimer l'Avatar",
+  'profile.deleteAvatarConfirm':
+    'Êtes-vous sûr de vouloir supprimer votre avatar ?',
+  'profile.success': 'Succès',
+  'profile.avatarUpdated': 'Avatar mis à jour avec succès',
+  'profile.avatarUpdateFailed': "Échec de la mise à jour de l'avatar",
+  'profile.avatarDeleted': 'Avatar supprimé avec succès',
+  'profile.avatarDeleteFailed': "Échec de la suppression de l'avatar",
+  'profile.personalInfo': 'Informations Personnelles',
+  'profile.contactInfo': 'Informations de Contact',
+  'profile.firstName': 'Prénom',
+  'profile.lastName': 'Nom',
+  'profile.firstNamePlaceholder': 'Entrez votre prénom',
+  'profile.lastNamePlaceholder': 'Entrez votre nom',
+  'profile.bioPlaceholder': 'Parlez-nous de vous...',
+  'profile.phonePlaceholder': '+221 77 123 45 67',
+  'profile.countryPlaceholder': 'Entrez votre pays',
+  'profile.accountSettingsNote':
+    'Pour changer votre email ou mot de passe, allez dans Paramètres du Compte',
+  'profile.noChanges': 'Aucune Modification',
+  'profile.noChangesMessage': "Vous n'avez effectué aucune modification",
+  'profile.profileUpdated': 'Profil mis à jour avec succès',
+  'profile.updateFailed': 'Échec de la mise à jour du profil',
 } as const;

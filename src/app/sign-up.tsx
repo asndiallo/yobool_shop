@@ -173,7 +173,7 @@ export default function SignUpScreen() {
               name="email"
               label={t('auth.email')}
               placeholder={t('auth.emailPlaceholder')}
-              leftIcon="house.fill"
+              leftIcon="envelope"
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
@@ -184,7 +184,7 @@ export default function SignUpScreen() {
               name="password"
               label={t('auth.password')}
               placeholder={t('auth.passwordPlaceholder')}
-              leftIcon="house.fill"
+              leftIcon="key"
               secureTextEntry
               editable={!isLoading}
             />
@@ -194,7 +194,7 @@ export default function SignUpScreen() {
               name="confirmPassword"
               label={t('auth.confirmPassword')}
               placeholder={t('auth.confirmPasswordPlaceholder')}
-              leftIcon="house.fill"
+              leftIcon="key"
               secureTextEntry
               editable={!isLoading}
             />

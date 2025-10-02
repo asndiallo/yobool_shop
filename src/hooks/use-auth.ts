@@ -281,15 +281,20 @@ export function useAuthHook() {
   const exchangeOauthToken = useCallback(
     async (code: string) => {
       setState((prev) => ({ ...prev, isLoadingGoogle: true }));
+      await updateAuthState({ status: 'loading' });
 
       try {
         const data = await exchangeOAuthToken({ code });
         await handleOAuthResponse(data);
+      } catch (error) {
+        console.error('[OAuth] Token exchange error:', error);
+        await updateAuthState({ status: 'error', error: String(error) });
+        throw error;
       } finally {
         setState((prev) => ({ ...prev, isLoadingGoogle: false }));
       }
     },
-    [handleOAuthResponse]
+    [handleOAuthResponse, updateAuthState]
   );
 
   const signInWithApple = useCallback(

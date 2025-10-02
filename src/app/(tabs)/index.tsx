@@ -24,6 +24,8 @@ import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
+import { useAuthState } from '@/contexts/AuthContext';
+import { isAuthenticated } from '@/types';
 import { formatPrice, formatPriceFrom } from '@/utils';
 import PopularStores from '@/components/popular-stores';
 import type { Store } from '@/data/stores';
@@ -65,6 +67,7 @@ const YoBoolHomeScreen: React.FC = () => {
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
+  const { state: authState } = useAuthState();
 
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [, setLoading] = useState(false);
@@ -159,6 +162,16 @@ const YoBoolHomeScreen: React.FC = () => {
     console.log('Category pressed:', category.name);
   };
 
+  const handleAvatarPress = () => {
+    if (isAuthenticated(authState)) {
+      // Navigate to own profile
+      router.push(`/profile/${authState.user.id}`);
+    } else {
+      // Navigate to sign in
+      router.push('/sign-in');
+    }
+  };
+
   const renderHeader = () => (
     <ThemedView style={styles.header}>
       <ThemedView style={styles.headerTop}>
@@ -183,13 +196,48 @@ const YoBoolHomeScreen: React.FC = () => {
               <Caption style={styles.badgeText}>2</Caption>
             </ThemedView>
           </Pressable>
-          <Pressable onPress={() => router.push('/sign-in')}>
-            <Image
-              source={{
-                uri: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
-              }}
-              style={styles.avatar}
-            />
+          <Pressable onPress={handleAvatarPress}>
+            {isAuthenticated(authState) &&
+            authState.user.attributes.avatar_url ? (
+              <Image
+                source={{ uri: authState.user.attributes.avatar_url }}
+                style={styles.avatar}
+              />
+            ) : isAuthenticated(authState) ? (
+              <View
+                style={[
+                  styles.avatar,
+                  {
+                    backgroundColor: Colors[colorScheme].backgroundSecondary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}
+              >
+                <IconSymbol
+                  name="person.fill"
+                  size={20}
+                  color={Colors.primary}
+                />
+              </View>
+            ) : (
+              <View
+                style={[
+                  styles.avatar,
+                  {
+                    backgroundColor: Colors[colorScheme].backgroundSecondary,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}
+              >
+                <IconSymbol
+                  name="person.crop.circle"
+                  size={24}
+                  color={Colors.neutral.gray[400]}
+                />
+              </View>
+            )}
           </Pressable>
         </ThemedView>
       </ThemedView>

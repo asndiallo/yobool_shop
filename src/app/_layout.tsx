@@ -45,6 +45,50 @@ export default function RootLayout() {
               name="sign-up"
               options={{ headerShown: false, title: 'Sign Up' }}
             />
+            {/* <Stack.Screen
+              name="forgot-password"
+              options={{ headerShown: false, title: 'Forgot Password' }}
+            />
+            <Stack.Screen
+              name="reset-password"
+              options={{ headerShown: false, title: 'Reset Password' }}
+            /> */}
+            <Stack.Screen
+              name="profile/[id]"
+              options={{ headerShown: false, title: 'Profile' }}
+            />
+            <Stack.Screen
+              name="profile/edit"
+              options={{ headerShown: false, title: 'Edit Profile' }}
+            />
+            {/* <Stack.Screen
+              name="product/[id]"
+              options={{ headerShown: false, title: 'Product Details' }}
+            />
+            <Stack.Screen
+              name="cart"
+              options={{ headerShown: false, title: 'Your Cart' }}
+            />
+            <Stack.Screen
+              name="checkout"
+              options={{ headerShown: false, title: 'Checkout' }}
+            />
+            <Stack.Screen
+              name="order/[id]"
+              options={{ headerShown: false, title: 'Order Details' }}
+            />
+            <Stack.Screen
+              name="search"
+              options={{ headerShown: false, title: 'Search Products' }}
+            />
+            <Stack.Screen
+              name="category/[id]"
+              options={{ headerShown: false, title: 'Category' }}
+            />
+            <Stack.Screen
+              name="store/[id]"
+              options={{ headerShown: false, title: 'Store' }}
+            /> */}
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

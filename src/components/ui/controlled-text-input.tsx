@@ -2,15 +2,22 @@
 // CONTROLLED TEXT INPUT - React Hook Form compatible wrapper
 // ============================================================================
 
-import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+} from 'react-hook-form';
 import { TextInput, type TextInputProps } from './text-input';
 
 interface ControlledTextInputProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> extends Omit<TextInputProps, 'value' | 'onChangeText'> {
+> extends Omit<TextInputProps, 'value' | 'onChangeText' | 'error'> {
   control: Control<TFieldValues>;
   name: TName;
+  rules?: RegisterOptions<TFieldValues, TName>;
 }
 
 /**
@@ -23,12 +30,14 @@ export function ControlledTextInput<
 >({
   control,
   name,
+  rules,
   ...textInputProps
 }: ControlledTextInputProps<TFieldValues, TName>) {
   return (
     <Controller
       control={control}
       name={name}
+      rules={rules}
       render={({
         field: { onChange, onBlur, value },
         fieldState: { error },

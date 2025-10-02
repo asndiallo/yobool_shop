@@ -102,10 +102,13 @@ export default function SignInScreen() {
         if (code) {
           await exchangeOauthToken(code);
           router.replace('/(tabs)');
+        } else {
+          console.warn('[SignIn] No code in callback URL');
         }
+      } else {
       }
     } catch (error) {
-      console.error('Google sign in error:', error);
+      console.error('[SignIn] Google sign in error:', error);
     }
   }, [initiateGoogleAuth, exchangeOauthToken]);
 
@@ -174,7 +177,7 @@ export default function SignInScreen() {
               name="email"
               label={t('auth.email')}
               placeholder={t('auth.emailPlaceholder')}
-              leftIcon="house.fill"
+              leftIcon="envelope"
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
@@ -185,7 +188,7 @@ export default function SignInScreen() {
               name="password"
               label={t('auth.password')}
               placeholder={t('auth.passwordPlaceholder')}
-              leftIcon="house.fill"
+              leftIcon="key"
               secureTextEntry
               editable={!isLoading}
               containerStyle={authStyles.passwordInput}
