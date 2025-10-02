@@ -1,10 +1,10 @@
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
 } from 'react-native';
 import {
   BodySmall,
@@ -12,15 +12,8 @@ import {
   ControlledTextInput,
   Header,
   Heading3,
-  IconSymbol,
 } from '@/components/ui/';
-import {
-  BorderRadius,
-  Colors,
-  Opacity,
-  Spacing,
-  Typography,
-} from '@/constants/theme';
+import { Colors, Opacity } from '@/constants/theme';
 
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
@@ -30,11 +23,27 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, type SignUpFormData } from '@/schemas/auth.schema';
+import * as WebBrowser from 'expo-web-browser';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { authStyles } from '@/styles/auth.styles';
+import { useEffect, useState } from 'react';
+
+// Configure WebBrowser for optimal OAuth experience
+WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
   const borderColor = useThemeColor({}, 'border');
-  const { register, authState, initiateGoogleAuth } = useAuthHook();
+  const {
+    register,
+    authState,
+    initiateGoogleAuth,
+    exchangeOauthToken,
+    signInWithApple,
+    isLoadingGoogle,
+    isLoadingApple,
+  } = useAuthHook();
+  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 
   const {
     control,
@@ -50,7 +59,22 @@ export default function SignUpScreen() {
     },
   });
 
-  const isLoading = authState.status === 'loading' || isSubmitting;
+  // Check Apple Authentication availability
+  useEffect(() => {
+    const checkAppleAuth = async () => {
+      if (Platform.OS === 'ios') {
+        const available = await AppleAuthentication.isAvailableAsync();
+        setIsAppleAvailable(available);
+      }
+    };
+    checkAppleAuth();
+  }, []);
+
+  const isLoading =
+    authState.status === 'loading' ||
+    isSubmitting ||
+    isLoadingGoogle ||
+    isLoadingApple;
 
   const onSubmit = async (data: SignUpFormData) => {
     try {
@@ -76,16 +100,56 @@ export default function SignUpScreen() {
   const handleGoogleSignIn = async () => {
     try {
       const url = await initiateGoogleAuth();
-      // TODO: Open browser or WebView with url
-      console.log('Google OAuth URL:', url);
+
+      // Open OAuth URL with expo-web-browser
+      const result = await WebBrowser.openAuthSessionAsync(url, undefined, {
+        showInRecents: true,
+      });
+
+      if (result.type === 'success' && result.url) {
+        // Extract the authorization code from the callback URL
+        const urlParams = new URL(result.url).searchParams;
+        const code = urlParams.get('code');
+
+        if (code) {
+          await exchangeOauthToken(code);
+          router.replace('/(tabs)');
+        }
+      }
     } catch (error) {
       console.error('Google sign in error:', error);
     }
   };
 
   const handleAppleSignIn = async () => {
-    // TODO: Implement Apple Sign In with expo-apple-authentication
-    console.log('Apple Sign In - To be implemented');
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      // Send credential to server
+      await signInWithApple({
+        id_token: credential.identityToken!,
+        authorization_code: credential.authorizationCode!,
+        user_info: {
+          id: credential.user,
+          email: credential.email ?? undefined,
+          first_name: credential.fullName?.givenName ?? undefined,
+          last_name: credential.fullName?.familyName ?? undefined,
+        },
+      });
+
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      if (error.code === 'ERR_REQUEST_CANCELED') {
+        // User canceled the sign-in flow
+        return;
+      }
+      console.error('Apple sign in error:', error);
+    }
   };
 
   const handleSignInPress = () => {
@@ -93,80 +157,30 @@ export default function SignUpScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <Header title="" showBackButton />
+    <ThemedView style={authStyles.container}>
+      <Header showBackButton />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+        style={authStyles.keyboardView}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={authStyles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           {/* Header Section */}
-          <ThemedView style={styles.headerSection}>
+          <ThemedView style={authStyles.headerSection}>
             <Heading3>{t('auth.createAccount')}</Heading3>
             <BodySmall
-              style={[styles.subtitle, { opacity: Opacity.secondary }]}
+              style={[authStyles.subtitle, { opacity: Opacity.secondary }]}
             >
               {t('auth.joinYobool')}
             </BodySmall>
           </ThemedView>
 
-          {/* Social Sign In Buttons */}
-          <ThemedView style={styles.socialButtonsContainer}>
-            <Pressable
-              style={[styles.socialButton, { borderColor }]}
-              onPress={handleGoogleSignIn}
-              disabled={isLoading}
-            >
-              <IconSymbol
-                name="paperplane.fill"
-                size={20}
-                color={Colors.primary}
-              />
-              <BodySmall style={styles.socialButtonText}>
-                {t('auth.continueWithGoogle')}
-              </BodySmall>
-            </Pressable>
-
-            {Platform.OS === 'ios' && (
-              <Pressable
-                style={[styles.socialButton, { borderColor }]}
-                onPress={handleAppleSignIn}
-                disabled={isLoading}
-              >
-                <IconSymbol
-                  name="paperplane.fill"
-                  size={20}
-                  color={Colors.primary}
-                />
-                <BodySmall style={styles.socialButtonText}>
-                  {t('auth.continueWithApple')}
-                </BodySmall>
-              </Pressable>
-            )}
-          </ThemedView>
-
-          {/* Divider */}
-          <ThemedView style={styles.dividerContainer}>
-            <ThemedView
-              style={[styles.divider, { backgroundColor: borderColor }]}
-            />
-            <BodySmall
-              style={[styles.dividerText, { opacity: Opacity.secondary }]}
-            >
-              {t('auth.orContinueWith')}
-            </BodySmall>
-            <ThemedView
-              style={[styles.divider, { backgroundColor: borderColor }]}
-            />
-          </ThemedView>
-
           {/* Email & Password Form */}
-          <ThemedView style={styles.formContainer}>
+          <ThemedView style={authStyles.formContainer}>
             <ControlledTextInput
               control={control}
               name="email"
@@ -204,9 +218,9 @@ export default function SignUpScreen() {
               disabled={isLoading}
               variant="primary"
               size="lg"
-              style={styles.signUpButton}
+              style={authStyles.submitButton}
             >
-              {isLoading ? (
+              {isLoading && !isLoadingGoogle && !isLoadingApple ? (
                 <ActivityIndicator color={Colors.neutral.white} />
               ) : (
                 t('auth.register')
@@ -214,15 +228,65 @@ export default function SignUpScreen() {
             </Button>
           </ThemedView>
 
+          {/* Divider */}
+          <ThemedView style={authStyles.dividerContainer}>
+            <ThemedView
+              style={[authStyles.divider, { backgroundColor: borderColor }]}
+            />
+            <BodySmall style={authStyles.dividerText}>
+              {t('auth.orContinueWith')}
+            </BodySmall>
+            <ThemedView
+              style={[authStyles.divider, { backgroundColor: borderColor }]}
+            />
+          </ThemedView>
+
+          {/* Social Sign In Buttons */}
+          <ThemedView style={authStyles.socialButtonsContainer}>
+            <Pressable
+              style={[authStyles.socialButton, { borderColor }]}
+              onPress={handleGoogleSignIn}
+              disabled={isLoading}
+            >
+              {isLoadingGoogle ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <>
+                  <Image
+                    source={require('@/assets/icons/google.png')}
+                    style={authStyles.socialButtonIcon}
+                  />
+                  <BodySmall style={authStyles.socialButtonText}>
+                    {t('auth.continueWithGoogle')}
+                  </BodySmall>
+                </>
+              )}
+            </Pressable>
+
+            {Platform.OS === 'ios' && isAppleAvailable && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                }
+                buttonStyle={
+                  AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                }
+                cornerRadius={8}
+                style={{ width: '100%', height: 52 }}
+                onPress={handleAppleSignIn}
+              />
+            )}
+          </ThemedView>
+
           {/* Sign In Link */}
-          <ThemedView style={styles.signInContainer}>
-            <BodySmall style={{ opacity: Opacity.secondary }}>
+          <ThemedView style={authStyles.bottomLinkContainer}>
+            <BodySmall style={authStyles.bottomLinkTextSecondary}>
               {t('auth.alreadyHaveAccount')}{' '}
             </BodySmall>
             <Pressable onPress={handleSignInPress} disabled={isLoading}>
               <BodySmall
                 color="primary"
-                style={{ fontWeight: Typography.fontWeight.semiBold }}
+                style={authStyles.bottomLinkTextPrimary}
               >
                 {t('auth.signInLink')}
               </BodySmall>
@@ -233,64 +297,3 @@ export default function SignUpScreen() {
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing['3xl'],
-  },
-  headerSection: {
-    marginBottom: Spacing['3xl'],
-  },
-  subtitle: {
-    marginTop: Spacing.sm,
-  },
-  socialButtonsContainer: {
-    gap: Spacing.md,
-    marginBottom: Spacing['2xl'],
-  },
-  socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1.5,
-    minHeight: 52,
-    gap: Spacing.sm,
-  },
-  socialButtonText: {
-    fontWeight: Typography.fontWeight.medium,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing['2xl'],
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    paddingHorizontal: Spacing.md,
-  },
-  formContainer: {
-    gap: Spacing.lg,
-  },
-  signUpButton: {
-    marginTop: Spacing.md,
-  },
-  signInContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: Spacing['2xl'],
-  },
-});
