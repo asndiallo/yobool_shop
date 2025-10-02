@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 interface HeaderProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
@@ -48,17 +48,19 @@ export const Header: React.FC<HeaderProps> = ({
           </Pressable>
         )}
 
-        <ThemedView
-          style={[
-            styles.titleContainer,
-            !showBackButton && styles.titleContainerCentered,
-          ]}
-        >
-          <Heading4>{title}</Heading4>
-          {subtitle && (
-            <BodySmall style={styles.subtitle}>{subtitle}</BodySmall>
-          )}
-        </ThemedView>
+        {title && (
+          <ThemedView
+            style={[
+              styles.titleContainer,
+              !showBackButton && styles.titleContainerCentered,
+            ]}
+          >
+            <Heading4>{title}</Heading4>
+            {subtitle && (
+              <BodySmall style={styles.subtitle}>{subtitle}</BodySmall>
+            )}
+          </ThemedView>
+        )}
 
         {rightElement && (
           <ThemedView style={styles.rightElement}>{rightElement}</ThemedView>
