@@ -58,6 +58,22 @@ export const fr = {
   'error.auth.invalidCredentials': 'Identifiants invalides',
   'error.auth.sessionExpired': 'Session expirée',
 
+  // Validation
+  'validation.required': 'Ce champ est requis',
+  'validation.email': 'Veuillez entrer une adresse email valide',
+  'validation.url': 'Veuillez entrer une URL valide',
+  'validation.invalidType': 'Valeur invalide',
+  'validation.minLength': 'Doit contenir au moins {min} caractères',
+  'validation.passwordMinLength':
+    'Le mot de passe doit contenir au moins 8 caractères',
+  'validation.passwordUppercase':
+    'Le mot de passe doit contenir au moins une lettre majuscule',
+  'validation.passwordLowercase':
+    'Le mot de passe doit contenir au moins une lettre minuscule',
+  'validation.passwordNumber':
+    'Le mot de passe doit contenir au moins un chiffre',
+  'validation.passwordMismatch': 'Les mots de passe ne correspondent pas',
+
   // Navigation
   'nav.home': 'Accueil',
   'nav.profile': 'Profil',
