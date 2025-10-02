@@ -20,7 +20,7 @@ export const fr = {
     'Rejoignez YoBool et faites du shopping partout dans le monde',
   'auth.continueWithGoogle': 'Continuer avec Google',
   'auth.continueWithApple': 'Continuer avec Apple',
-  'auth.orContinueWith': 'Ou continuer avec',
+  'auth.orContinueWith': 'Ou',
   'auth.dontHaveAccount': "Vous n'avez pas de compte?",
   'auth.alreadyHaveAccount': 'Vous avez déjà un compte?',
   'auth.signUpLink': "S'inscrire",
