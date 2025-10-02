@@ -9,10 +9,10 @@ import {
 import {
   BodySmall,
   Button,
+  ControlledTextInput,
   Header,
   Heading3,
   IconSymbol,
-  TextInput,
 } from '@/components/ui/';
 import {
   BorderRadius,
@@ -25,63 +25,39 @@ import {
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
 import { useAuthHook } from '@/hooks/use-auth';
-import { useState } from 'react';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signUpSchema, type SignUpFormData } from '@/schemas/auth.schema';
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
   const borderColor = useThemeColor({}, 'border');
   const { register, authState, initiateGoogleAuth } = useAuthHook();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const isLoading = authState.status === 'loading';
+  const isLoading = authState.status === 'loading' || isSubmitting;
 
-  const validateForm = (): boolean => {
-    const newErrors: {
-      email?: string;
-      password?: string;
-      confirmPassword?: string;
-    } = {};
-
-    if (!email.trim()) {
-      newErrors.email = t('auth.fieldRequired');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = t('auth.invalidEmail');
-    }
-
-    if (!password) {
-      newErrors.password = t('auth.fieldRequired');
-    } else if (password.length < 8) {
-      newErrors.password = t('auth.passwordTooShort');
-    }
-
-    if (!confirmPassword) {
-      newErrors.confirmPassword = t('auth.fieldRequired');
-    } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = t('auth.passwordMismatch');
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSignUp = async () => {
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: SignUpFormData) => {
     try {
       await register({
-        email: email.trim(),
-        password,
-        password_confirmation: confirmPassword,
+        email: data.email.trim(),
+        password: data.password,
+        password_confirmation: data.confirmPassword,
         first_name: '',
         last_name: '',
       });
@@ -90,8 +66,9 @@ export default function SignUpScreen() {
       router.replace('/sign-in');
     } catch (error) {
       console.error('Sign up error:', error);
-      setErrors({
-        email: t('error.unknown'),
+      setError('email', {
+        type: 'manual',
+        message: t('error.unknown'),
       });
     }
   };
@@ -190,50 +167,32 @@ export default function SignUpScreen() {
 
           {/* Email & Password Form */}
           <ThemedView style={styles.formContainer}>
-            <TextInput
+            <ControlledTextInput
+              control={control}
+              name="email"
               label={t('auth.email')}
               placeholder={t('auth.emailPlaceholder')}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (errors.email) {
-                  setErrors({ ...errors, email: undefined });
-                }
-              }}
-              error={errors.email}
               leftIcon="house.fill"
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
             />
 
-            <TextInput
+            <ControlledTextInput
+              control={control}
+              name="password"
               label={t('auth.password')}
               placeholder={t('auth.passwordPlaceholder')}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (errors.password) {
-                  setErrors({ ...errors, password: undefined });
-                }
-              }}
-              error={errors.password}
               leftIcon="house.fill"
               secureTextEntry
               editable={!isLoading}
             />
 
-            <TextInput
+            <ControlledTextInput
+              control={control}
+              name="confirmPassword"
               label={t('auth.confirmPassword')}
               placeholder={t('auth.confirmPasswordPlaceholder')}
-              value={confirmPassword}
-              onChangeText={(text) => {
-                setConfirmPassword(text);
-                if (errors.confirmPassword) {
-                  setErrors({ ...errors, confirmPassword: undefined });
-                }
-              }}
-              error={errors.confirmPassword}
               leftIcon="house.fill"
               secureTextEntry
               editable={!isLoading}
@@ -241,7 +200,7 @@ export default function SignUpScreen() {
 
             {/* Sign Up Button */}
             <Button
-              onPress={handleSignUp}
+              onPress={handleSubmit(onSubmit)}
               disabled={isLoading}
               variant="primary"
               size="lg"

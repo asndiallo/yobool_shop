@@ -1,8 +1,3 @@
-import {} from '@/components/ui/button';
-import {} from '@/components/ui/header';
-import {} from '@/components/ui/icon-symbol';
-import {} from '@/components/ui/text-input';
-
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -14,10 +9,10 @@ import {
 import {
   BodySmall,
   Button,
+  ControlledTextInput,
   Header,
   Heading3,
   IconSymbol,
-  TextInput,
 } from '@/components/ui/';
 import {
   BorderRadius,
@@ -30,57 +25,45 @@ import {
 import { ThemedView } from '@/components/themed-view';
 import { router } from 'expo-router';
 import { useAuthHook } from '@/hooks/use-auth';
-import { useState } from 'react';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signInSchema, type SignInFormData } from '@/schemas/auth.schema';
 
 export default function SignInScreen() {
   const { t } = useTranslation();
   const borderColor = useThemeColor({}, 'border');
   const { login, authState, initiateGoogleAuth } = useAuthHook();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-  }>({});
+  const {
+    control,
+    handleSubmit,
+    setError,
+    formState: { isSubmitting },
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  const isLoading = authState.status === 'loading';
+  const isLoading = authState.status === 'loading' || isSubmitting;
 
-  const validateForm = (): boolean => {
-    const newErrors: { email?: string; password?: string } = {};
-
-    if (!email.trim()) {
-      newErrors.email = t('auth.fieldRequired');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = t('auth.invalidEmail');
-    }
-
-    if (!password) {
-      newErrors.password = t('auth.fieldRequired');
-    } else if (password.length < 8) {
-      newErrors.password = t('auth.passwordTooShort');
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSignIn = async () => {
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: SignInFormData) => {
     try {
       await login({
-        email: email.trim(),
-        password,
+        email: data.email.trim(),
+        password: data.password,
       });
 
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Sign in error:', error);
-      setErrors({
-        password: t('error.auth.invalidCredentials'),
+      setError('password', {
+        type: 'manual',
+        message: t('error.auth.invalidCredentials'),
       });
     }
   };
@@ -179,34 +162,22 @@ export default function SignInScreen() {
 
           {/* Email & Password Form */}
           <ThemedView style={styles.formContainer}>
-            <TextInput
+            <ControlledTextInput
+              control={control}
+              name="email"
               label={t('auth.email')}
               placeholder={t('auth.emailPlaceholder')}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                if (errors.email) {
-                  setErrors({ ...errors, email: undefined });
-                }
-              }}
-              error={errors.email}
               leftIcon="house.fill"
               keyboardType="email-address"
               autoCapitalize="none"
               editable={!isLoading}
             />
 
-            <TextInput
+            <ControlledTextInput
+              control={control}
+              name="password"
               label={t('auth.password')}
               placeholder={t('auth.passwordPlaceholder')}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                if (errors.password) {
-                  setErrors({ ...errors, password: undefined });
-                }
-              }}
-              error={errors.password}
               leftIcon="house.fill"
               secureTextEntry
               editable={!isLoading}
@@ -224,7 +195,7 @@ export default function SignInScreen() {
 
             {/* Sign In Button */}
             <Button
-              onPress={handleSignIn}
+              onPress={handleSubmit(onSubmit)}
               disabled={isLoading}
               variant="primary"
               size="lg"
