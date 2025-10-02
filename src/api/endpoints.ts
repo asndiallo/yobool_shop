@@ -170,6 +170,34 @@ export const APIEndpoints = {
         'POST'
       ),
   },
+  products: {
+    ...EndpointFactory.createCrudEndpoints({ resource: 'products' }),
+    publish: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/products`, id, 'publish'),
+        'PATCH'
+      ),
+    archive: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/products`, id, 'archive'),
+        'PATCH'
+      ),
+    feature: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/products`, id, 'feature'),
+        'PATCH'
+      ),
+    draft: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/products`, id, 'draft'),
+        'PATCH'
+      ),
+    toggleBookmark: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/products`, id, 'toggle_bookmark'),
+        'POST'
+      ),
+  },
   profiles: {
     ...EndpointFactory.createCrudEndpoints({ resource: 'profiles' }),
     deleteAvatar: (id: string): Endpoint =>
@@ -191,6 +219,38 @@ export const APIEndpoints = {
       EndpointFactory.create(
         URLBuilder.action(`${API_BASE_URL}/profiles`, id, 'toggle_bookmark'),
         'POST'
+      ),
+  },
+  quotes: {
+    show: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.resource(`${API_BASE_URL}/quotes`, id),
+        'GET'
+      ),
+    update: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.resource(`${API_BASE_URL}/quotes`, id),
+        'PATCH'
+      ),
+    destroy: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.resource(`${API_BASE_URL}/quotes`, id),
+        'DELETE'
+      ),
+    accept: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/quotes`, id, 'accept'),
+        'PATCH'
+      ),
+    reject: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/quotes`, id, 'reject'),
+        'PATCH'
+      ),
+    details: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/quotes`, id, 'details'),
+        'GET'
       ),
   },
   reviews: {
@@ -227,6 +287,66 @@ export const APIEndpoints = {
       'POST'
     ),
   },
+  shoppingOrders: {
+    ...EndpointFactory.createCrudEndpoints({ resource: 'shopping_orders' }),
+    requestQuotes: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(
+          `${API_BASE_URL}/shopping_orders`,
+          id,
+          'request_quotes'
+        ),
+        'PATCH'
+      ),
+    acceptQuote: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(
+          `${API_BASE_URL}/shopping_orders`,
+          id,
+          'accept_quote'
+        ),
+        'PATCH'
+      ),
+    cancel: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'cancel'),
+        'PATCH'
+      ),
+    purchase: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'purchase'),
+        'PATCH'
+      ),
+    ship: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'ship'),
+        'PATCH'
+      ),
+    deliver: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'deliver'),
+        'PATCH'
+      ),
+    refund: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'refund'),
+        'PATCH'
+      ),
+    quotes: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/shopping_orders`, id, 'quotes'),
+        'GET'
+      ),
+    eligibleTrips: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(
+          `${API_BASE_URL}/shopping_orders`,
+          id,
+          'eligible_trips'
+        ),
+        'GET'
+      ),
+  },
   stripe: {
     loginLink: EndpointFactory.create(
       `${API_BASE_URL}/stripe/login_link`,
@@ -234,6 +354,52 @@ export const APIEndpoints = {
     ),
     onboarding: EndpointFactory.create(
       `${API_BASE_URL}/stripe/onboarding`,
+      'POST'
+    ),
+  },
+  trips: {
+    ...EndpointFactory.createCrudEndpoints({ resource: 'trips' }),
+    activate: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'activate'),
+        'PATCH'
+      ),
+    startTransit: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'start_transit'),
+        'PATCH'
+      ),
+    complete: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'complete'),
+        'PATCH'
+      ),
+    cancel: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'cancel'),
+        'PATCH'
+      ),
+    shoppingOrders: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'shopping_orders'),
+        'GET'
+      ),
+    quotes: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'quotes'),
+        'GET'
+      ),
+    canAccommodate: (id: string): Endpoint =>
+      EndpointFactory.create(
+        URLBuilder.action(`${API_BASE_URL}/trips`, id, 'can_accommodate'),
+        'GET'
+      ),
+    availableForShopping: EndpointFactory.create(
+      `${API_BASE_URL}/trips/available_for_shopping`,
+      'GET'
+    ),
+    createRoundTrip: EndpointFactory.create(
+      `${API_BASE_URL}/trips/create_round_trip`,
       'POST'
     ),
   },
