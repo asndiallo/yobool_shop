@@ -37,6 +37,7 @@ interface AuthHookState {
   authState: AuthState;
   isInitialized: boolean;
   isLoadingGoogle: boolean;
+  isLoadingApple: boolean;
 }
 
 // ============================================================================
@@ -48,6 +49,7 @@ export function useAuthHook() {
     authState: { status: 'unauthenticated' },
     isInitialized: false,
     isLoadingGoogle: false,
+    isLoadingApple: false,
   });
 
   const refreshTimerRef = useRef<number | null>(null);
@@ -292,7 +294,7 @@ export function useAuthHook() {
 
   const signInWithApple = useCallback(
     async (signInData: AppleSignInData) => {
-      await updateAuthState({ status: 'loading' });
+      setState((prev) => ({ ...prev, isLoadingApple: true }));
 
       try {
         const response = await serverSignInWithApple(signInData);
@@ -300,6 +302,8 @@ export function useAuthHook() {
       } catch (error) {
         await updateAuthState({ status: 'error', error: String(error) });
         throw error;
+      } finally {
+        setState((prev) => ({ ...prev, isLoadingApple: false }));
       }
     },
     [handleOAuthResponse, updateAuthState]
@@ -366,6 +370,7 @@ export function useAuthHook() {
     authState: state.authState,
     isInitialized: state.isInitialized,
     isLoadingGoogle: state.isLoadingGoogle,
+    isLoadingApple: state.isLoadingApple,
     initializeAuth,
     login,
     register,
