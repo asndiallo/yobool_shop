@@ -58,6 +58,14 @@ const formatShortDate = (
   }
 };
 
+const countryCodeToFlag = (countryCode: string): string => {
+  return countryCode
+    .toUpperCase()
+    .split('')
+    .map((char) => String.fromCodePoint(0x1f1e6 + char.charCodeAt(0) - 65))
+    .join('');
+};
+
 const SkeletonBox = ({
   width,
   height,
@@ -466,7 +474,7 @@ export default function ProfileScreen() {
                       { color: Colors.neutral.gray[500] },
                     ]}
                   >
-                    {profile.attributes.country}
+                    {countryCodeToFlag(profile.attributes.country)}
                   </Caption>
                   <View style={styles.metaDot} />
                 </>
