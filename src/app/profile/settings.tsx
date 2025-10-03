@@ -1,9 +1,9 @@
 // ============================================================================
-// SETTINGS SCREEN - Account management and preferences
+// ENHANCED SETTINGS SCREEN - Cleaner, more intuitive design
 // ============================================================================
 
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { BodySmall, Header, Heading4, IconSymbol } from '@/components/ui';
+import { BodySmall, Header, IconSymbol } from '@/components/ui';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import React, { useCallback, useState } from 'react';
 import { RequireAuth, useAuth } from '@/contexts/AuthContext';
@@ -115,7 +115,6 @@ export default function SettingsScreen() {
                   text: t('common.delete') || 'Delete',
                   style: 'destructive',
                   onPress: () => {
-                    // TODO: Implement account deletion
                     console.log('Delete account');
                   },
                 },
@@ -172,10 +171,10 @@ export default function SettingsScreen() {
     },
   ];
 
-  const renderSettingItem = (item: SettingItem) => {
+  const renderSettingItem = (item: SettingItem, isLast: boolean = false) => {
     const iconColor = item.destructive
       ? Colors.danger
-      : Colors.neutral.gray[500];
+      : Colors.neutral.gray[600];
     const labelColor = item.destructive ? Colors.danger : textColor;
 
     return (
@@ -183,8 +182,9 @@ export default function SettingsScreen() {
         key={item.label}
         style={[
           styles.settingItem,
-          {
-            borderBottomColor: Colors[colorScheme].border,
+          !isLast && {
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: Colors.neutral.gray[200],
           },
         ]}
         onPress={item.onPress}
@@ -193,24 +193,18 @@ export default function SettingsScreen() {
         accessibilityRole="button"
       >
         <View style={styles.settingLeft}>
-          <View
-            style={[
-              styles.iconContainer,
-              {
-                backgroundColor: item.destructive
-                  ? `${Colors.danger}15`
-                  : Colors[colorScheme].background,
-              },
-            ]}
-          >
-            <IconSymbol name={item.icon as any} size={20} color={iconColor} />
-          </View>
+          <IconSymbol name={item.icon as any} size={22} color={iconColor} />
           <View style={styles.settingContent}>
             <BodySmall style={[styles.settingLabel, { color: labelColor }]}>
               {item.label}
             </BodySmall>
             {item.value && (
-              <BodySmall style={[styles.settingValue, { color: textColor }]}>
+              <BodySmall
+                style={[
+                  styles.settingValue,
+                  { color: Colors.neutral.gray[500] },
+                ]}
+              >
                 {item.value}
               </BodySmall>
             )}
@@ -219,8 +213,8 @@ export default function SettingsScreen() {
         {item.showChevron && (
           <IconSymbol
             name="chevron.right"
-            size={16}
-            color={Colors.neutral.gray[400]}
+            size={18}
+            color={Colors.neutral.gray[300]}
           />
         )}
       </Pressable>
@@ -257,53 +251,71 @@ export default function SettingsScreen() {
         <View style={styles.content}>
           {/* Account Settings */}
           <View style={styles.section}>
-            <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-              {t('settings.account') || 'Account'}
-            </Heading4>
+            <BodySmall
+              style={[styles.sectionTitle, { color: Colors.neutral.gray[500] }]}
+            >
+              {t('settings.account') || 'ACCOUNT'}
+            </BodySmall>
             <View
               style={[
                 styles.card,
                 { backgroundColor: Colors[colorScheme].backgroundSecondary },
               ]}
             >
-              {accountSettings.map(renderSettingItem)}
+              {accountSettings.map((item, idx) =>
+                renderSettingItem(item, idx === accountSettings.length - 1)
+              )}
             </View>
           </View>
 
           {/* Preferences */}
           <View style={styles.section}>
-            <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-              {t('settings.preferences') || 'Preferences'}
-            </Heading4>
+            <BodySmall
+              style={[styles.sectionTitle, { color: Colors.neutral.gray[500] }]}
+            >
+              {t('settings.preferences') || 'PREFERENCES'}
+            </BodySmall>
             <View
               style={[
                 styles.card,
                 { backgroundColor: Colors[colorScheme].backgroundSecondary },
               ]}
             >
-              {preferenceSettings.map(renderSettingItem)}
+              {preferenceSettings.map((item, idx) =>
+                renderSettingItem(item, idx === preferenceSettings.length - 1)
+              )}
             </View>
           </View>
 
           {/* Danger Zone */}
           <View style={styles.section}>
-            <Heading4 style={[styles.sectionTitle, { color: Colors.danger }]}>
-              {t('settings.dangerZone') || 'Danger Zone'}
-            </Heading4>
+            <BodySmall
+              style={[styles.sectionTitle, { color: Colors.neutral.gray[500] }]}
+            >
+              {t('settings.dangerZone') || 'DANGER ZONE'}
+            </BodySmall>
             <View
               style={[
                 styles.card,
                 { backgroundColor: Colors[colorScheme].backgroundSecondary },
               ]}
             >
-              {dangerSettings.map(renderSettingItem)}
+              {dangerSettings.map((item, idx) =>
+                renderSettingItem(item, idx === dangerSettings.length - 1)
+              )}
             </View>
           </View>
 
           {/* App Info */}
           <View style={styles.appInfo}>
-            <BodySmall style={{ color: textColor, textAlign: 'center' }}>
-              {t('settings.version') || 'Version'}: 1.0.0
+            <BodySmall
+              style={{
+                color: Colors.neutral.gray[400],
+                textAlign: 'center',
+                fontSize: 12,
+              }}
+            >
+              Yobool {t('settings.version') || 'Version'} 1.0.0
             </BodySmall>
           </View>
         </View>
@@ -332,7 +344,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   sectionTitle: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    paddingLeft: Spacing.xs,
   },
   card: {
     borderRadius: BorderRadius.lg,
@@ -343,9 +360,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.lg,
-    borderBottomWidth: 0.5,
+    minHeight: 56,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -353,25 +370,18 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: Spacing.md,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   settingContent: {
     flex: 1,
-    gap: 2,
+    gap: 3,
   },
   settingLabel: {
-    fontSize: 15,
+    fontSize: 16,
   },
   settingValue: {
-    fontSize: 13,
+    fontSize: 14,
   },
   appInfo: {
-    marginTop: Spacing.lg,
-    paddingTop: Spacing.xl,
+    marginTop: Spacing.md,
+    paddingTop: Spacing.lg,
   },
 });
