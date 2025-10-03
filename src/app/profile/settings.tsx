@@ -6,11 +6,11 @@ import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { BodySmall, Header, Heading4, IconSymbol } from '@/components/ui';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import React, { useCallback, useState } from 'react';
+import { RequireAuth, useAuth } from '@/contexts/AuthContext';
 
 import { ThemedView } from '@/components/themed-view';
 import { isAuthenticated } from '@/types';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
@@ -31,8 +31,6 @@ export default function SettingsScreen() {
   const textColor = useThemeColor({}, 'text');
   const { state: authState, actions } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const currentUser = isAuthenticated(authState) ? authState.user : null;
 
   const handleLogout = useCallback(async () => {
     Alert.alert(
@@ -129,28 +127,13 @@ export default function SettingsScreen() {
     );
   }, [t]);
 
-  if (!currentUser) {
-    return (
-      <ThemedView style={[styles.container, { backgroundColor }]}>
-        <Header
-          title={t('settings.title') || 'Settings'}
-          showBackButton
-          onBackPress={() => router.back()}
-        />
-        <View style={styles.errorContainer}>
-          <BodySmall style={{ color: textColor }}>
-            {t('auth.notAuthenticated') || 'Not authenticated'}
-          </BodySmall>
-        </View>
-      </ThemedView>
-    );
-  }
+  const currentUser = isAuthenticated(authState) ? authState.user : null;
 
   const accountSettings: SettingItem[] = [
     {
       icon: 'envelope.fill',
       label: t('settings.changeEmail') || 'Change Email',
-      value: currentUser.attributes.email,
+      value: currentUser?.attributes.email || '',
       onPress: handleChangeEmail,
       showChevron: true,
     },
@@ -245,70 +228,87 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor }]}
-      contentContainerStyle={styles.scrollContent}
+    <RequireAuth
+      fallback={
+        <ThemedView style={[styles.container, { backgroundColor }]}>
+          <Header
+            title={t('settings.title') || 'Settings'}
+            showBackButton
+            onBackPress={() => router.back()}
+          />
+          <View style={styles.errorContainer}>
+            <BodySmall style={{ color: textColor }}>
+              {t('auth.notAuthenticated') || 'Not authenticated'}
+            </BodySmall>
+          </View>
+        </ThemedView>
+      }
     >
-      <Header
-        title={t('settings.title') || 'Settings'}
-        showBackButton
-        onBackPress={() => router.back()}
-      />
+      <ScrollView
+        style={[styles.container, { backgroundColor }]}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <Header
+          title={t('settings.title') || 'Settings'}
+          showBackButton
+          onBackPress={() => router.back()}
+        />
 
-      <View style={styles.content}>
-        {/* Account Settings */}
-        <View style={styles.section}>
-          <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-            {t('settings.account') || 'Account'}
-          </Heading4>
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: Colors[colorScheme].backgroundSecondary },
-            ]}
-          >
-            {accountSettings.map(renderSettingItem)}
+        <View style={styles.content}>
+          {/* Account Settings */}
+          <View style={styles.section}>
+            <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
+              {t('settings.account') || 'Account'}
+            </Heading4>
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: Colors[colorScheme].backgroundSecondary },
+              ]}
+            >
+              {accountSettings.map(renderSettingItem)}
+            </View>
+          </View>
+
+          {/* Preferences */}
+          <View style={styles.section}>
+            <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
+              {t('settings.preferences') || 'Preferences'}
+            </Heading4>
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: Colors[colorScheme].backgroundSecondary },
+              ]}
+            >
+              {preferenceSettings.map(renderSettingItem)}
+            </View>
+          </View>
+
+          {/* Danger Zone */}
+          <View style={styles.section}>
+            <Heading4 style={[styles.sectionTitle, { color: Colors.danger }]}>
+              {t('settings.dangerZone') || 'Danger Zone'}
+            </Heading4>
+            <View
+              style={[
+                styles.card,
+                { backgroundColor: Colors[colorScheme].backgroundSecondary },
+              ]}
+            >
+              {dangerSettings.map(renderSettingItem)}
+            </View>
+          </View>
+
+          {/* App Info */}
+          <View style={styles.appInfo}>
+            <BodySmall style={{ color: textColor, textAlign: 'center' }}>
+              {t('settings.version') || 'Version'}: 1.0.0
+            </BodySmall>
           </View>
         </View>
-
-        {/* Preferences */}
-        <View style={styles.section}>
-          <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-            {t('settings.preferences') || 'Preferences'}
-          </Heading4>
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: Colors[colorScheme].backgroundSecondary },
-            ]}
-          >
-            {preferenceSettings.map(renderSettingItem)}
-          </View>
-        </View>
-
-        {/* Danger Zone */}
-        <View style={styles.section}>
-          <Heading4 style={[styles.sectionTitle, { color: Colors.danger }]}>
-            {t('settings.dangerZone') || 'Danger Zone'}
-          </Heading4>
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: Colors[colorScheme].backgroundSecondary },
-            ]}
-          >
-            {dangerSettings.map(renderSettingItem)}
-          </View>
-        </View>
-
-        {/* App Info */}
-        <View style={styles.appInfo}>
-          <BodySmall style={{ color: textColor, textAlign: 'center' }}>
-            {t('settings.version') || 'Version'}: 1.0.0
-          </BodySmall>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </RequireAuth>
   );
 }
 
