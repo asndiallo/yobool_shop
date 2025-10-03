@@ -1,4 +1,4 @@
-import { EntityId } from '@/types';
+import { EntityId, UserId } from '@/types';
 
 /**
  * JSON:API helper utilities for working with included relationships
@@ -35,7 +35,7 @@ export function extractIncludedByType<T extends JsonApiResource>(
 export function findIncluded<T extends JsonApiResource>(
   included: unknown[] | undefined,
   type: string,
-  id: EntityId
+  id: EntityId | UserId
 ): T | undefined {
   if (!included) return undefined;
 
@@ -56,7 +56,7 @@ export function findIncluded<T extends JsonApiResource>(
 export function extractRelationshipData<T extends JsonApiResource>(
   included: unknown[] | undefined,
   relationshipData:
-    | { readonly id: EntityId; readonly type: string }[]
+    | { readonly id: EntityId | UserId; readonly type: string }[]
     | undefined,
   type: string
 ): T[] {

@@ -21,7 +21,8 @@ import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
 import type { DeepPartial, EntityId, UserAttributes, UserId } from '@/types';
 import { EditableField, EditableSection } from '@/components/profile/';
 import React, { useCallback, useState } from 'react';
-import { Trip, isAuthenticated } from '@/types';
+import { Trip, User, isAuthenticated } from '@/types';
+import { extractRelationshipData, findIncluded } from '@/utils/json-api';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
   useDeleteAvatar,
@@ -32,7 +33,6 @@ import {
 import { useProfileReviews, useVoteOnReview } from '@/hooks/use-reviews';
 
 import { ThemedView } from '@/components/themed-view';
-import { extractRelationshipData } from '@/utils/json-api';
 import { useAuthState } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
@@ -157,7 +157,6 @@ export default function ProfileScreen() {
 
   const reviews = reviewsData?.data
     ? [...reviewsData.data].sort((a, b) => {
-        // Sort by helpful count (vote_count) descending
         return b.attributes.vote_count - a.attributes.vote_count;
       })
     : [];
@@ -363,22 +362,6 @@ export default function ProfileScreen() {
     );
   }
 
-  const verificationBadges = [];
-  if (profile.attributes.is_verified) {
-    verificationBadges.push({
-      icon: 'checkmark.seal.fill' as const,
-      label: t('profile.verified') || 'Verified',
-      color: Colors.success,
-    });
-  }
-  if (profile.attributes.can_accept_bookings) {
-    verificationBadges.push({
-      icon: 'creditcard.fill' as const,
-      label: t('profile.canAcceptBookings') || 'Can Accept Bookings',
-      color: Colors.primary,
-    });
-  }
-
   const displayAvatar = optimisticAvatar || profile.attributes.avatar_url;
 
   return (
@@ -459,19 +442,43 @@ export default function ProfileScreen() {
             <Heading3 style={[styles.name, { color: textColor }]}>
               {profile.attributes.full_name}
             </Heading3>
-            {verificationBadges.length > 0 && (
-              <View style={styles.badgesContainer}>
-                {verificationBadges.map((badge, index) => (
-                  <View key={index} style={styles.badgeChip}>
-                    <IconSymbol
-                      name={badge.icon}
-                      size={12}
-                      color={badge.color}
-                    />
-                  </View>
-                ))}
-              </View>
-            )}
+
+            <View style={styles.metaRow}>
+              {profile.attributes.is_verified && (
+                <>
+                  <IconSymbol
+                    name="checkmark.seal.fill"
+                    size={13}
+                    color={Colors.success}
+                  />
+                  <Caption style={[styles.metaText, { color: Colors.success }]}>
+                    {t('profile.verified') || 'Verified'}
+                  </Caption>
+                  <View style={styles.metaDot} />
+                </>
+              )}
+
+              {profile.attributes.country && (
+                <>
+                  <Caption
+                    style={[
+                      styles.metaText,
+                      { color: Colors.neutral.gray[500] },
+                    ]}
+                  >
+                    {profile.attributes.country}
+                  </Caption>
+                  <View style={styles.metaDot} />
+                </>
+              )}
+
+              <Caption
+                style={[styles.metaText, { color: Colors.neutral.gray[500] }]}
+              >
+                {t('profile.memberSince') || 'Member Since'}{' '}
+                {new Date(profile.attributes.member_since).getFullYear()}
+              </Caption>
+            </View>
           </View>
         </View>
       </ThemedView>
@@ -552,7 +559,7 @@ export default function ProfileScreen() {
                 value={profile.attributes.first_name || ''}
                 onSave={(value) => handleFieldUpdate('first_name', value)}
                 placeholder={
-                  t('profile.firstNamePlaceholder') || 'Enter firstname'
+                  t('profile.firstNamePlaceholder') || 'Enter first name'
                 }
                 editable={isEditMode}
                 autoCapitalize="words"
@@ -703,7 +710,7 @@ export default function ProfileScreen() {
       {reviews.length > 0 && (
         <ThemedView style={styles.section}>
           <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-            {t('profile.reviews') || 'Reviews'}
+            {t('profile.reviews') || 'Reviews'} ({reviews.length})
           </Heading4>
           <ScrollView
             horizontal
@@ -711,64 +718,125 @@ export default function ProfileScreen() {
             contentContainerStyle={styles.reviewsScrollContent}
             style={styles.reviewsScroll}
           >
-            {reviews.map((review) => (
-              <View
-                key={review.id}
-                style={[
-                  styles.reviewCard,
-                  { backgroundColor: Colors[colorScheme].backgroundSecondary },
-                ]}
-              >
-                <View style={styles.reviewHeader}>
-                  <View style={styles.ratingContainer}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <IconSymbol
-                        key={index}
-                        name={
-                          index < review.attributes.rating
-                            ? 'star.fill'
-                            : 'star'
-                        }
-                        size={14}
-                        color={
-                          index < review.attributes.rating
-                            ? Colors.warning
-                            : Colors.neutral.gray[300]
-                        }
-                      />
-                    ))}
-                  </View>
-                  <Caption style={{ color: Colors.neutral.gray[500] }}>
-                    {formatShortDate(review.attributes.created_at, language)}
-                  </Caption>
-                </View>
-                {review.attributes.text && (
-                  <BodySmall
-                    style={[styles.reviewComment, { color: textColor }]}
-                    numberOfLines={4}
-                  >
-                    {review.attributes.text}
-                  </BodySmall>
-                )}
-                <Pressable
-                  style={styles.helpfulButton}
-                  onPress={() => handleVoteReview(review.id)}
-                  disabled={voteOnReviewMutation.isPending}
-                  accessibilityLabel="Mark review as helpful"
-                  accessibilityRole="button"
+            {reviews.map((review) => {
+              const reviewer = review.relationships?.reviewer?.data
+                ? ((profileData?.included
+                    ? findIncluded<User>(
+                        profileData.included,
+                        review.relationships.reviewer.data.type,
+                        review.relationships.reviewer.data.id
+                      )
+                    : undefined) as User | undefined)
+                : undefined;
+
+              return (
+                <View
+                  key={review.id}
+                  style={[
+                    styles.reviewCard,
+                    {
+                      backgroundColor: Colors[colorScheme].backgroundSecondary,
+                    },
+                  ]}
                 >
-                  <IconSymbol
-                    name="hand.thumbsup"
-                    size={14}
-                    color={Colors.neutral.gray[500]}
-                  />
-                  <Caption style={{ color: Colors.neutral.gray[500] }}>
-                    {t('profile.helpful') || 'Helpful'} (
-                    {review.attributes.votes_count})
-                  </Caption>
-                </Pressable>
-              </View>
-            ))}
+                  <View style={styles.reviewHeader}>
+                    <View style={styles.reviewerInfo}>
+                      {reviewer && (
+                        <>
+                          {reviewer.attributes.avatar_url ? (
+                            <Image
+                              source={{ uri: reviewer.attributes.avatar_url }}
+                              style={styles.reviewerAvatar}
+                              accessibilityIgnoresInvertColors
+                            />
+                          ) : (
+                            <View
+                              style={[
+                                styles.reviewerAvatarPlaceholder,
+                                {
+                                  backgroundColor:
+                                    Colors[colorScheme].background,
+                                },
+                              ]}
+                            >
+                              <IconSymbol
+                                name="person.fill"
+                                size={16}
+                                color={Colors.neutral.gray[400]}
+                              />
+                            </View>
+                          )}
+                          <View style={styles.reviewerDetails}>
+                            <BodySmall
+                              style={[
+                                styles.reviewerName,
+                                { color: textColor },
+                              ]}
+                            >
+                              {reviewer.attributes.first_name}
+                            </BodySmall>
+                            <Caption
+                              style={{ color: Colors.neutral.gray[500] }}
+                            >
+                              {formatShortDate(
+                                review.attributes.created_at,
+                                language
+                              )}
+                            </Caption>
+                          </View>
+                        </>
+                      )}
+                    </View>
+
+                    <View style={styles.ratingContainer}>
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <IconSymbol
+                          key={index}
+                          name={
+                            index < review.attributes.rating
+                              ? 'star.fill'
+                              : 'star'
+                          }
+                          size={14}
+                          color={
+                            index < review.attributes.rating
+                              ? Colors.warning
+                              : Colors.neutral.gray[300]
+                          }
+                        />
+                      ))}
+                    </View>
+                  </View>
+
+                  {review.attributes.text && (
+                    <BodySmall
+                      style={[styles.reviewComment, { color: textColor }]}
+                      numberOfLines={4}
+                    >
+                      {review.attributes.text}
+                    </BodySmall>
+                  )}
+
+                  <Pressable
+                    style={styles.helpfulButton}
+                    onPress={() => handleVoteReview(review.id)}
+                    disabled={voteOnReviewMutation.isPending}
+                    accessibilityLabel="Mark review as helpful"
+                    accessibilityRole="button"
+                  >
+                    <IconSymbol
+                      name="hand.thumbsup"
+                      size={13}
+                      color={Colors.neutral.gray[500]}
+                    />
+                    <Caption style={{ color: Colors.neutral.gray[500] }}>
+                      {t('profile.helpful') || 'Helpful'} (
+                      {review.attributes.votes_count})
+                    </Caption>
+                  </Pressable>
+                </View>
+              );
+            })}
           </ScrollView>
         </ThemedView>
       )}
@@ -890,9 +958,26 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     flex: 1,
+    gap: 4,
   },
   name: {
-    marginBottom: Spacing.xs,
+    marginBottom: 2,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  metaText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  metaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: Colors.neutral.gray[400],
   },
   badgesContainer: {
     flexDirection: 'row',
@@ -1007,13 +1092,40 @@ const styles = StyleSheet.create({
     width: 280,
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
-    gap: Spacing.sm,
+    gap: Spacing.md,
     ...Shadows.sm,
   },
   reviewHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+  },
+  reviewerInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    flex: 1,
+  },
+  reviewerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  reviewerAvatarPlaceholder: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  reviewerDetails: {
+    flex: 1,
+    gap: 2,
+  },
+  reviewerName: {
+    fontWeight: '600',
+    fontSize: 14,
   },
   ratingContainer: {
     flexDirection: 'row',
@@ -1021,12 +1133,13 @@ const styles = StyleSheet.create({
   },
   reviewComment: {
     lineHeight: 20,
+    fontSize: 14,
   },
   helpfulButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-    paddingTop: Spacing.xs,
+    gap: 6,
+    paddingTop: Spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Colors.neutral.gray[200],
   },
