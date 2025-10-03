@@ -88,11 +88,31 @@ export const en = {
   'nav.settings': 'Settings',
 
   // Settings
+  'settings.title': 'Settings',
+  'settings.account': 'Account',
+  'settings.preferences': 'Preferences',
+  'settings.dangerZone': 'Danger Zone',
   'settings.language': 'Language',
+  'settings.languageValue': 'English',
+  'settings.languageMessage': 'Language preferences coming soon',
   'settings.theme': 'Theme',
   'settings.notifications': 'Notifications',
   'settings.privacy': 'Privacy',
   'settings.about': 'About',
+  'settings.version': 'Version',
+  'settings.changeEmail': 'Change Email',
+  'settings.changeEmailMessage': 'Email change functionality coming soon',
+  'settings.changePassword': 'Change Password',
+  'settings.changePasswordMessage': 'Password change functionality coming soon',
+  'settings.logout': 'Logout',
+  'settings.logoutConfirm': 'Are you sure you want to logout?',
+  'settings.logoutError': 'Failed to logout. Please try again.',
+  'settings.deleteAccount': 'Delete Account',
+  'settings.deleteAccountWarning':
+    'This action is permanent and cannot be undone. All your data will be deleted.',
+  'settings.deleteAccountConfirm': 'Are you absolutely sure?',
+  'settings.deleteAccountFinal':
+    'This will permanently delete your account and all associated data.',
 
   // Home Screen
   'home.brand': 'YoBool',
@@ -161,6 +181,7 @@ export const en = {
   'profile.information': 'Information',
   'profile.bio': 'Bio',
   'profile.noBio': 'No bio added yet',
+  'profile.editBio': 'Edit Bio',
   'profile.verified': 'Verified',
   'profile.message': 'Message',
   'profile.report': 'Report User',

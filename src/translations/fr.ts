@@ -92,11 +92,32 @@ export const fr = {
   'nav.settings': 'Paramètres',
 
   // Settings
+  'settings.title': 'Paramètres',
+  'settings.account': 'Compte',
+  'settings.preferences': 'Préférences',
+  'settings.dangerZone': 'Zone de Danger',
   'settings.language': 'Langue',
+  'settings.languageValue': 'Français',
+  'settings.languageMessage': 'Les préférences linguistiques arrivent bientôt',
   'settings.theme': 'Thème',
   'settings.notifications': 'Notifications',
   'settings.privacy': 'Confidentialité',
   'settings.about': 'À propos',
+  'settings.version': 'Version',
+  'settings.changeEmail': "Changer l'Email",
+  'settings.changeEmailMessage': "Le changement d'email arrive bientôt",
+  'settings.changePassword': 'Changer le Mot de Passe',
+  'settings.changePasswordMessage':
+    'Le changement de mot de passe arrive bientôt',
+  'settings.logout': 'Déconnexion',
+  'settings.logoutConfirm': 'Êtes-vous sûr de vouloir vous déconnecter ?',
+  'settings.logoutError': 'Échec de la déconnexion. Veuillez réessayer.',
+  'settings.deleteAccount': 'Supprimer le Compte',
+  'settings.deleteAccountWarning':
+    'Cette action est permanente et ne peut pas être annulée. Toutes vos données seront supprimées.',
+  'settings.deleteAccountConfirm': 'Êtes-vous absolument sûr ?',
+  'settings.deleteAccountFinal':
+    'Cela supprimera définitivement votre compte et toutes les données associées.',
 
   // Home Screen
   'home.brand': 'YoBool',
@@ -166,6 +187,7 @@ export const fr = {
   'profile.information': 'Informations',
   'profile.bio': 'Bio',
   'profile.noBio': 'Aucune bio ajoutée',
+  'profile.editBio': 'Modifier la Bio',
   'profile.verified': 'Vérifié',
   'profile.message': 'Message',
   'profile.report': 'Signaler',
