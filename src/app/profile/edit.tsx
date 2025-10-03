@@ -17,7 +17,7 @@ import { Spacing } from '@/constants/theme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
 import { useUpdateUserAttributes } from '@/hooks/use-profile';
-import { useAuthHook } from '@/hooks/use-auth';
+import { useAuthState } from '@/contexts/AuthContext';
 import {
   isAuthenticated,
   type UserAttributes,
@@ -36,7 +36,7 @@ export default function EditProfileScreen() {
   const { t } = useTranslation();
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
-  const { authState } = useAuthHook();
+  const { state: authState } = useAuthState();
 
   const updateAttributesMutation = useUpdateUserAttributes();
 
