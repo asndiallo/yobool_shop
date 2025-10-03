@@ -58,8 +58,8 @@ export default function RootLayout() {
               options={{ headerShown: false, title: 'Profile' }}
             />
             <Stack.Screen
-              name="profile/edit"
-              options={{ headerShown: false, title: 'Edit Profile' }}
+              name="profile/settings"
+              options={{ headerShown: false, title: 'Settings' }}
             />
             {/* <Stack.Screen
               name="product/[id]"
