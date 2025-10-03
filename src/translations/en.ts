@@ -95,6 +95,7 @@ export const en = {
   'settings.language': 'Language',
   'settings.languageValue': 'English',
   'settings.languageMessage': 'Language preferences coming soon',
+  'settings.selectLanguage': 'Select your preferred language',
   'settings.theme': 'Theme',
   'settings.notifications': 'Notifications',
   'settings.privacy': 'Privacy',
@@ -219,13 +220,14 @@ export const en = {
   'profile.profileUpdated': 'Profile updated successfully',
   'profile.updateFailed': 'Failed to update profile',
   'profile.upcomingTrips': 'Upcoming Trips',
-  'profile.reviews': 'reviews',
-  'profile.users': 'users',
+  'profile.reviews': 'User Reviews',
+  'profile.users': 'Users',
   'profile.birthday': 'Birthday',
   'profile.referrals': 'Referrals',
   'profile.canAcceptBookings': 'Can Accept Bookings',
   'profile.yourReferralCode': 'Your Referral Code',
   'profile.referralCode': 'Referral Code',
+  'profile.helpful': 'Helpful',
 } as const;
 
 export type TranslationKey = keyof typeof en;
