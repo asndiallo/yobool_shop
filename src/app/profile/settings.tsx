@@ -1,6 +1,7 @@
 // ============================================================================
 // ENHANCED SETTINGS SCREEN - Cleaner, more intuitive design
 // ============================================================================
+import * as Application from 'expo-application';
 
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { BodySmall, Header, IconSymbol } from '@/components/ui';
@@ -25,7 +26,7 @@ interface SettingItem {
 }
 
 export default function SettingsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -82,11 +83,27 @@ export default function SettingsScreen() {
   }, [t]);
 
   const handleChangeLanguage = useCallback(() => {
+    const currentLanguage = i18n.language;
+    const options = [
+      {
+        text: 'English',
+        onPress: () => i18n.changeLanguage('en'),
+        style: currentLanguage === 'en' ? 'default' : 'cancel',
+      },
+      {
+        text: 'Français',
+        onPress: () => i18n.changeLanguage('fr'),
+        style: currentLanguage === 'fr' ? 'default' : 'cancel',
+      },
+      { text: t('common.cancel') || 'Cancel', style: 'cancel' },
+    ];
+
     Alert.alert(
       t('settings.language') || 'Language',
-      t('settings.languageMessage') || 'This feature is not yet implemented.'
+      t('settings.selectLanguage') || 'Select your preferred language',
+      options as any
     );
-  }, [t]);
+  }, [t, i18n]);
 
   const handleDeleteAccount = useCallback(() => {
     Alert.alert(
@@ -144,11 +161,16 @@ export default function SettingsScreen() {
     },
   ];
 
+  const languageLabels: Record<string, string> = {
+    en: 'English',
+    fr: 'Français',
+  };
+
   const preferenceSettings: SettingItem[] = [
     {
       icon: 'globe',
       label: t('settings.language') || 'Language',
-      value: t('settings.languageValue') || 'English',
+      value: languageLabels[i18n.language] || 'English',
       onPress: handleChangeLanguage,
       showChevron: true,
     },
@@ -315,7 +337,9 @@ export default function SettingsScreen() {
                 fontSize: 12,
               }}
             >
-              Yobool {t('settings.version') || 'Version'} 1.0.0
+              {`Yobool ${t('settings.version') || 'Version'} ${
+                Application.nativeApplicationVersion
+              } (${Application.nativeBuildVersion})`}
             </BodySmall>
           </View>
         </View>
