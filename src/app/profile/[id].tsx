@@ -37,30 +37,9 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
 
-// ============================================================================
-// LOCALE MAPPING
-// ============================================================================
-
 const LOCALE_MAP: Record<string, string> = {
   en: 'en-US',
   fr: 'fr-FR',
-};
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-const formatDate = (dateString: string, language: string = 'en'): string => {
-  try {
-    const bcp47Locale = LOCALE_MAP[language] || 'en-US';
-    return new Date(dateString).toLocaleDateString(bcp47Locale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  } catch {
-    return dateString;
-  }
 };
 
 const formatShortDate = (
@@ -77,10 +56,6 @@ const formatShortDate = (
     return dateString;
   }
 };
-
-// ============================================================================
-// SKELETON LOADING COMPONENT
-// ============================================================================
 
 const SkeletonBox = ({
   width,
@@ -114,36 +89,27 @@ const ProfileSkeleton = () => {
   return (
     <ThemedView style={[styles.container, { backgroundColor }]}>
       <View style={styles.profileHeader}>
-        <SkeletonBox width={120} height={120} style={{ borderRadius: 60 }} />
+        <SkeletonBox width={100} height={100} style={{ borderRadius: 50 }} />
         <SkeletonBox
-          width={200}
-          height={32}
+          width={180}
+          height={28}
           style={{ marginTop: Spacing.md }}
-        />
-        <SkeletonBox
-          width={100}
-          height={20}
-          style={{ marginTop: Spacing.xs }}
         />
       </View>
 
-      <View style={styles.statsContainer}>
+      <View style={styles.statsRow}>
         {[1, 2, 3].map((i) => (
-          <SkeletonBox key={i} width="30%" height={100} />
+          <SkeletonBox key={i} width={70} height={60} />
         ))}
       </View>
 
       <View style={{ paddingHorizontal: Spacing.lg, gap: Spacing.lg }}>
-        <SkeletonBox width="100%" height={120} />
-        <SkeletonBox width="100%" height={180} />
+        <SkeletonBox width="100%" height={100} />
+        <SkeletonBox width="100%" height={160} />
       </View>
     </ThemedView>
   );
 };
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 
 export default function ProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -156,14 +122,11 @@ export default function ProfileScreen() {
   const textColor = useThemeColor({}, 'text');
   const { state: authState } = useAuthState();
 
-  // Optimistic avatar state
   const [optimisticAvatar, setOptimisticAvatar] = useState<string | null>(null);
 
-  // Determine if viewing own profile
   const currentUserId = isAuthenticated(authState) ? authState.user.id : null;
   const isOwnProfile = currentUserId === id;
 
-  // Fetch profile data with optimized staleTime
   const {
     data: profileData,
     isLoading,
@@ -179,7 +142,6 @@ export default function ProfileScreen() {
 
   const profile = profileData?.data;
 
-  // Extract upcoming trips - server already filters, no need to filter again
   const upcomingTrips =
     profile?.relationships?.trips?.data && profileData?.included
       ? extractRelationshipData<Trip>(
@@ -188,10 +150,6 @@ export default function ProfileScreen() {
           'trip'
         ).slice(0, 3)
       : [];
-
-  // ============================================================================
-  // EVENT HANDLERS
-  // ============================================================================
 
   const handleImagePick = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -217,7 +175,6 @@ export default function ProfileScreen() {
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
 
-      // Validate file size (max 5MB)
       if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
         Alert.alert(
           t('common.error') || 'Error',
@@ -226,7 +183,6 @@ export default function ProfileScreen() {
         return;
       }
 
-      // Optimistic update
       setOptimisticAvatar(asset.uri);
 
       const formData = new FormData();
@@ -238,9 +194,7 @@ export default function ProfileScreen() {
 
       try {
         await updateAvatarMutation.mutateAsync(formData);
-        // Success - optimistic state will be replaced by server data
       } catch (error) {
-        // Rollback optimistic update
         setOptimisticAvatar(null);
         console.error('Error updating avatar:', error);
         Alert.alert(
@@ -254,14 +208,11 @@ export default function ProfileScreen() {
   const handleDeleteAvatar = useCallback(async () => {
     if (!id) return;
 
-    // Optimistic update
     setOptimisticAvatar(null);
 
     try {
       await deleteAvatarMutation.mutateAsync(id);
-      // Success
     } catch (error) {
-      // Rollback - restore original avatar
       setOptimisticAvatar(profile?.attributes.avatar_url || null);
       console.error('Error deleting avatar:', error);
       Alert.alert(
@@ -335,15 +286,11 @@ export default function ProfileScreen() {
   );
 
   const handleTripPress = useCallback((trip: Trip) => {
-    // TODO: Navigate to trip details instead of alert
-    // router.push(`/trips/${trip.id}`);
     console.log('Trip pressed:', trip.id);
   }, []);
 
   const handleMessagePress = useCallback(() => {
     if (!profile) return;
-    // TODO: Implement messaging functionality
-    // router.push(`/messages/${profile.id}`);
     console.log('Message user:', profile.id);
   }, [profile]);
 
@@ -358,17 +305,12 @@ export default function ProfileScreen() {
           text: t('profile.report') || 'Report',
           style: 'destructive',
           onPress: () => {
-            // TODO: Implement report functionality
             console.log('Report user:', profile.id);
           },
         },
       ]
     );
   }, [profile, t]);
-
-  // ============================================================================
-  // RENDER HELPERS
-  // ============================================================================
 
   if (isLoading || !profile) {
     return (
@@ -399,34 +341,6 @@ export default function ProfileScreen() {
     );
   }
 
-  const statsData = [
-    {
-      label: t('profile.score') || 'Score',
-      value: profile.attributes.yobool_score?.toFixed(0) || '75',
-      sublabel: '/100',
-      icon: 'star.fill' as const,
-      color: Colors.warning,
-    },
-    {
-      label: t('profile.deliveries') || 'Deliveries',
-      value: profile.attributes.successful_deliveries || 0,
-      icon: 'checkmark.circle.fill' as const,
-      color: Colors.success,
-    },
-    {
-      label: t('profile.rating') || 'Rating',
-      value: profile.attributes.average_rating?.toFixed(1) || '-',
-      sublabel: profile.attributes.average_rating ? '/5.0' : '',
-      icon: 'heart.fill' as const,
-      color: Colors.danger,
-      badge: profile.attributes.reviews_count
-        ? `${profile.attributes.reviews_count} ${
-            t('profile.reviews') || 'reviews'
-          }`
-        : undefined,
-    },
-  ];
-
   const verificationBadges = [];
   if (profile.attributes.is_verified) {
     verificationBadges.push({
@@ -444,10 +358,6 @@ export default function ProfileScreen() {
   }
 
   const displayAvatar = optimisticAvatar || profile.attributes.avatar_url;
-
-  // ============================================================================
-  // MAIN RENDER
-  // ============================================================================
 
   return (
     <ScrollView
@@ -477,144 +387,132 @@ export default function ProfileScreen() {
         }
       />
 
-      {/* Profile Header */}
+      {/* Compact Profile Header */}
       <ThemedView style={styles.profileHeader}>
-        <Pressable
-          onPress={handleAvatarPress}
-          disabled={!isOwnProfile}
-          accessibilityLabel={
-            isOwnProfile ? 'Change profile picture' : 'Profile picture'
-          }
-          accessibilityRole="button"
-        >
-          <View style={styles.avatarContainer}>
-            {displayAvatar ? (
-              <Image
-                source={{ uri: displayAvatar }}
-                style={styles.avatar}
-                accessibilityIgnoresInvertColors
-              />
-            ) : (
-              <View
-                style={[
-                  styles.avatarPlaceholder,
-                  { backgroundColor: Colors[colorScheme].backgroundSecondary },
-                ]}
-              >
-                <IconSymbol
-                  name="person.fill"
-                  size={64}
-                  color={Colors.neutral.gray[400]}
-                />
-              </View>
-            )}
-            {isOwnProfile && (
-              <View style={styles.editBadge}>
-                <IconSymbol
-                  name="camera.fill"
-                  size={16}
-                  color={Colors.neutral.white}
-                />
-              </View>
-            )}
-          </View>
-        </Pressable>
-
-        <Heading3 style={[styles.name, { color: textColor }]}>
-          {profile.attributes.full_name}
-        </Heading3>
-
-        {verificationBadges.length > 0 && (
-          <View style={styles.badgesContainer}>
-            {verificationBadges.map((badge, index) => (
-              <View
-                key={index}
-                style={[styles.badge, { backgroundColor: `${badge.color}15` }]}
-              >
-                <IconSymbol name={badge.icon} size={14} color={badge.color} />
-                <Caption
-                  style={{
-                    color: badge.color,
-                    marginLeft: 4,
-                    fontWeight: '600',
-                  }}
-                >
-                  {badge.label}
-                </Caption>
-              </View>
-            ))}
-          </View>
-        )}
-      </ThemedView>
-
-      {/* Stats */}
-      <View style={styles.statsContainer}>
-        {statsData.map((stat, index) => (
-          <View
-            key={index}
-            style={[
-              styles.statCard,
-              { backgroundColor: Colors[colorScheme].backgroundSecondary },
-            ]}
+        <View style={styles.headerRow}>
+          <Pressable
+            onPress={handleAvatarPress}
+            disabled={!isOwnProfile}
+            accessibilityLabel={
+              isOwnProfile ? 'Change profile picture' : 'Profile picture'
+            }
+            accessibilityRole="button"
           >
-            <View
-              style={[
-                styles.statIconBg,
-                { backgroundColor: `${stat.color}15` },
-              ]}
-            >
-              <IconSymbol name={stat.icon} size={24} color={stat.color} />
-            </View>
-            <View style={styles.statContent}>
-              <View style={styles.statValueRow}>
-                <Heading3 style={{ color: textColor }}>{stat.value}</Heading3>
-                {stat.sublabel && (
-                  <Caption style={[styles.statSublabel, { color: textColor }]}>
-                    {stat.sublabel}
-                  </Caption>
-                )}
-              </View>
-              <Caption style={[styles.statLabel, { color: textColor }]}>
-                {stat.label}
-              </Caption>
-              {stat.badge && (
-                <Caption
+            <View style={styles.avatarContainer}>
+              {displayAvatar ? (
+                <Image
+                  source={{ uri: displayAvatar }}
+                  style={styles.avatar}
+                  accessibilityIgnoresInvertColors
+                />
+              ) : (
+                <View
                   style={[
-                    styles.statBadge,
-                    { backgroundColor: `${stat.color}20` },
+                    styles.avatarPlaceholder,
+                    {
+                      backgroundColor: Colors[colorScheme].backgroundSecondary,
+                    },
                   ]}
                 >
-                  {stat.badge}
-                </Caption>
+                  <IconSymbol
+                    name="person.fill"
+                    size={42}
+                    color={Colors.neutral.gray[400]}
+                  />
+                </View>
+              )}
+              {isOwnProfile && (
+                <View style={styles.editBadge}>
+                  <IconSymbol
+                    name="camera.fill"
+                    size={12}
+                    color={Colors.neutral.white}
+                  />
+                </View>
               )}
             </View>
-          </View>
-        ))}
-      </View>
+          </Pressable>
 
-      {/* Bio Section */}
-      <ThemedView style={styles.section}>
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: Colors[colorScheme].backgroundSecondary },
-          ]}
-        >
-          <EditableField
-            label={t('profile.bio') || 'Bio'}
-            value={profile.attributes.bio || ''}
-            onSave={(value) => handleFieldUpdate('bio', value)}
-            placeholder={
-              t('profile.bioPlaceholder') || 'Tell us about yourself'
-            }
-            editable={isOwnProfile}
-            multiline
-            numberOfLines={4}
-          />
+          <View style={styles.nameContainer}>
+            <Heading3 style={[styles.name, { color: textColor }]}>
+              {profile.attributes.full_name}
+            </Heading3>
+            {verificationBadges.length > 0 && (
+              <View style={styles.badgesContainer}>
+                {verificationBadges.map((badge, index) => (
+                  <View key={index} style={styles.badgeChip}>
+                    <IconSymbol
+                      name={badge.icon}
+                      size={12}
+                      color={badge.color}
+                    />
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
       </ThemedView>
 
-      {/* Info Section */}
+      {/* Inline Stats */}
+      <View style={styles.statsRow}>
+        <View style={styles.statItem}>
+          <Heading4 style={{ color: textColor }}>
+            {profile.attributes.yobool_score?.toFixed(0) || '75'}
+          </Heading4>
+          <Caption style={[styles.statLabel, { color: textColor }]}>
+            {t('profile.score') || 'Score'}
+          </Caption>
+        </View>
+
+        <View style={styles.statDivider} />
+
+        <View style={styles.statItem}>
+          <Heading4 style={{ color: textColor }}>
+            {profile.attributes.successful_deliveries || 0}
+          </Heading4>
+          <Caption style={[styles.statLabel, { color: textColor }]}>
+            {t('profile.deliveries') || 'Deliveries'}
+          </Caption>
+        </View>
+
+        <View style={styles.statDivider} />
+
+        <View style={styles.statItem}>
+          <Heading4 style={{ color: textColor }}>
+            {profile.attributes.average_rating?.toFixed(1) || '-'}
+          </Heading4>
+          <Caption style={[styles.statLabel, { color: textColor }]}>
+            {t('profile.rating') || 'Rating'}
+          </Caption>
+        </View>
+      </View>
+
+      {/* Bio Section */}
+      {(isOwnProfile || profile.attributes.bio) && (
+        <ThemedView style={styles.section}>
+          <View
+            style={[
+              styles.card,
+              { backgroundColor: Colors[colorScheme].backgroundSecondary },
+            ]}
+          >
+            <EditableField
+              label={t('profile.bio') || 'Bio'}
+              value={profile.attributes.bio || ''}
+              onSave={(value) => handleFieldUpdate('bio', value)}
+              placeholder={
+                t('profile.bioPlaceholder') || 'Tell us about yourself'
+              }
+              editable={isOwnProfile}
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+        </ThemedView>
+      )}
+
+      {/* Info Section - Streamlined */}
       <ThemedView style={styles.section}>
         <EditableSection
           title={t('profile.information') || 'Information'}
@@ -627,13 +525,12 @@ export default function ProfileScreen() {
                 { backgroundColor: Colors[colorScheme].backgroundSecondary },
               ]}
             >
-              {/* First Name */}
               <EditableField
                 label={t('profile.firstName') || 'First Name'}
                 value={profile.attributes.first_name || ''}
                 onSave={(value) => handleFieldUpdate('first_name', value)}
                 placeholder={
-                  t('profile.firstNamePlaceholder') || 'Enter first name'
+                  t('profile.firstNamePlaceholder') || 'Enter firstname'
                 }
                 editable={isEditMode}
                 autoCapitalize="words"
@@ -651,7 +548,6 @@ export default function ProfileScreen() {
               />
               <View style={styles.divider} />
 
-              {/* Last Name */}
               <EditableField
                 label={t('profile.lastName') || 'Last Name'}
                 value={profile.attributes.last_name || ''}
@@ -672,11 +568,10 @@ export default function ProfileScreen() {
                   },
                 }}
               />
-              <View style={styles.divider} />
 
-              {/* Phone */}
               {(isOwnProfile || profile.attributes.phone_number) && (
                 <>
+                  <View style={styles.divider} />
                   <EditableField
                     label={t('profile.phone') || 'Phone'}
                     value={profile.attributes.phone_number || ''}
@@ -696,11 +591,11 @@ export default function ProfileScreen() {
                       },
                     }}
                   />
-                  <View style={styles.divider} />
                 </>
               )}
 
-              {/* Country */}
+              <View style={styles.divider} />
+
               <EditableField
                 label={t('profile.country') || 'Country'}
                 value={profile.attributes.country || ''}
@@ -713,41 +608,12 @@ export default function ProfileScreen() {
                     t('validation.countryRequired') || 'Country is required',
                 }}
               />
-              <View style={styles.divider} />
-
-              {/* Member Since - Read Only */}
-              <EditableField
-                label={t('profile.memberSince') || 'Member Since'}
-                value={
-                  profile.attributes.member_since
-                    ? formatDate(profile.attributes.member_since, language)
-                    : '-'
-                }
-                onSave={async () => {}}
-                editable={false}
-              />
-
-              {/* Referrals - Read Only */}
-              {isOwnProfile &&
-                profile.attributes.referred_users_count !== undefined && (
-                  <>
-                    <View style={styles.divider} />
-                    <EditableField
-                      label={t('profile.referrals') || 'Referrals'}
-                      value={`${profile.attributes.referred_users_count || 0} ${
-                        t('profile.users') || 'users'
-                      }`}
-                      onSave={async () => {}}
-                      editable={false}
-                    />
-                  </>
-                )}
             </View>
           )}
         </EditableSection>
       </ThemedView>
 
-      {/* Upcoming Trips */}
+      {/* Compact Trip Cards */}
       {upcomingTrips.length > 0 && (
         <ThemedView style={styles.section}>
           <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
@@ -765,85 +631,45 @@ export default function ProfileScreen() {
                 accessibilityLabel={`Trip from ${trip.attributes.route_info?.departure_city} to ${trip.attributes.route_info?.destination_city}`}
                 accessibilityRole="button"
               >
-                <View style={styles.tripHeader}>
-                  <View
-                    style={[
-                      styles.tripStatusBadge,
-                      {
-                        backgroundColor:
-                          trip.attributes.status === 'active'
-                            ? `${Colors.success}20`
-                            : `${Colors.primary}20`,
-                      },
-                    ]}
-                  >
-                    <Caption
-                      style={{
-                        color:
-                          trip.attributes.status === 'active'
-                            ? Colors.success
-                            : Colors.primary,
-                        fontWeight: '600',
-                        textTransform: 'capitalize',
-                      }}
-                    >
-                      {trip.attributes.status}
-                    </Caption>
-                  </View>
-                  <IconSymbol
-                    name="chevron.right"
-                    size={16}
-                    color={Colors.neutral.gray[400]}
-                  />
-                </View>
-
-                <View style={styles.tripRoute}>
-                  <View style={styles.tripLocation}>
-                    <IconSymbol
-                      name="airplane.departure"
-                      size={20}
-                      color={Colors.primary}
-                    />
-                    <View style={styles.tripLocationText}>
+                <View style={styles.tripContent}>
+                  <View style={styles.tripRoute}>
+                    <View style={styles.cityBlock}>
                       <BodySmall
-                        style={[styles.tripCity, { color: textColor }]}
-                        numberOfLines={1}
+                        style={[styles.cityName, { color: textColor }]}
                       >
                         {trip.attributes.route_info?.departure_city}
                       </BodySmall>
-                      <Caption style={{ color: textColor, opacity: 0.6 }}>
+                      <Caption style={{ color: Colors.neutral.gray[500] }}>
                         {formatShortDate(
                           trip.attributes.departure_at,
                           language
                         )}
                       </Caption>
                     </View>
-                  </View>
 
-                  <IconSymbol
-                    name="arrow.right"
-                    size={20}
-                    color={Colors.neutral.gray[400]}
-                  />
-
-                  <View style={styles.tripLocation}>
                     <IconSymbol
-                      name="airplane.arrival"
-                      size={20}
-                      color={Colors.success}
+                      name="arrow.right"
+                      size={16}
+                      color={Colors.neutral.gray[400]}
                     />
-                    <View style={styles.tripLocationText}>
+
+                    <View style={styles.cityBlock}>
                       <BodySmall
-                        style={[styles.tripCity, { color: textColor }]}
-                        numberOfLines={1}
+                        style={[styles.cityName, { color: textColor }]}
                       >
                         {trip.attributes.route_info?.destination_city}
                       </BodySmall>
-                      <Caption style={{ color: textColor, opacity: 0.6 }}>
+                      <Caption style={{ color: Colors.neutral.gray[500] }}>
                         {formatShortDate(trip.attributes.arrival_at, language)}
                       </Caption>
                     </View>
                   </View>
+
+                  <IconSymbol
+                    name="chevron.right"
+                    size={16}
+                    color={Colors.neutral.gray[300]}
+                  />
                 </View>
               </Pressable>
             ))}
@@ -852,8 +678,8 @@ export default function ProfileScreen() {
       )}
 
       {/* Action Buttons */}
-      <ThemedView style={styles.actionButtons}>
-        {!isOwnProfile ? (
+      {!isOwnProfile && (
+        <ThemedView style={styles.actionButtons}>
           <View style={styles.actionRow}>
             <Button
               variant="primary"
@@ -870,50 +696,46 @@ export default function ProfileScreen() {
               {t('profile.report') || 'Report'}
             </Button>
           </View>
-        ) : (
-          <>
-            {profile.attributes.referral_code && (
-              <View style={styles.referralContainer}>
-                <BodySmall style={{ color: textColor, opacity: 0.7 }}>
-                  {t('profile.yourReferralCode') || 'Your Referral Code'}
-                </BodySmall>
-                <Pressable
-                  style={[
-                    styles.referralCode,
-                    {
-                      backgroundColor: Colors[colorScheme].backgroundSecondary,
-                    },
-                  ]}
-                  onPress={() => {
-                    Alert.alert(
-                      t('profile.referralCode') || 'Referral Code',
-                      profile.attributes.referral_code!
-                    );
-                  }}
-                  accessibilityLabel="Copy referral code"
-                  accessibilityRole="button"
-                >
-                  <Heading4 style={{ color: Colors.primary }}>
-                    {profile.attributes.referral_code}
-                  </Heading4>
-                  <IconSymbol
-                    name="doc.on.doc"
-                    size={20}
-                    color={Colors.primary}
-                  />
-                </Pressable>
-              </View>
-            )}
-          </>
-        )}
-      </ThemedView>
+        </ThemedView>
+      )}
+
+      {/* Referral Code for Own Profile */}
+      {isOwnProfile && profile.attributes.referral_code && (
+        <ThemedView style={styles.referralSection}>
+          <Caption
+            style={{
+              color: Colors.neutral.gray[500],
+              marginBottom: Spacing.xs,
+            }}
+          >
+            {t('profile.yourReferralCode') || 'Your Referral Code'}
+          </Caption>
+          <Pressable
+            style={[
+              styles.referralCode,
+              {
+                backgroundColor: Colors[colorScheme].backgroundSecondary,
+              },
+            ]}
+            onPress={() => {
+              Alert.alert(
+                t('profile.referralCode') || 'Referral Code',
+                profile.attributes.referral_code!
+              );
+            }}
+            accessibilityLabel="Copy referral code"
+            accessibilityRole="button"
+          >
+            <Heading4 style={{ color: Colors.primary }}>
+              {profile.attributes.referral_code}
+            </Heading4>
+            <IconSymbol name="doc.on.doc" size={18} color={Colors.primary} />
+          </Pressable>
+        </ThemedView>
+      )}
     </ScrollView>
   );
 }
-
-// ============================================================================
-// STYLES
-// ============================================================================
 
 const styles = StyleSheet.create({
   container: {
@@ -934,116 +756,88 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   profileHeader: {
-    alignItems: 'center',
-    paddingVertical: Spacing.xl,
+    paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: Spacing.md,
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.md,
+    ...Shadows.sm,
   },
   editBadge: {
     position: 'absolute',
     bottom: 0,
     right: 0,
     backgroundColor: Colors.primary,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
     ...Shadows.md,
   },
+  nameContainer: {
+    flex: 1,
+  },
   name: {
-    marginBottom: Spacing.sm,
-    textAlign: 'center',
+    marginBottom: Spacing.xs,
   },
   badgesContainer: {
     flexDirection: 'row',
-    gap: Spacing.sm,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: Spacing.xs,
+    gap: Spacing.xs,
   },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.xl,
-    gap: Spacing.sm,
-  },
-  statCard: {
-    flex: 1,
-    alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    ...Shadows.sm,
-  },
-  statIconBg: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  badgeChip: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: `${Colors.success}20`,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
   },
-  statContent: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  statValueRow: {
+  statsRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: Spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
+    marginBottom: Spacing.md,
   },
-  statSublabel: {
-    fontSize: 12,
-    opacity: 0.5,
-    marginLeft: 2,
+  statItem: {
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: Colors.neutral.gray[200],
   },
   statLabel: {
     fontSize: 11,
-    opacity: 0.7,
-    textAlign: 'center',
-  },
-  statBadge: {
-    marginTop: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
-    borderRadius: BorderRadius.sm,
-    fontSize: 10,
+    opacity: 0.6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   section: {
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
     paddingHorizontal: Spacing.lg,
   },
   sectionTitle: {
-    marginBottom: Spacing.md,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: Spacing.md,
   },
   card: {
@@ -1054,49 +848,38 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: Colors.neutral.gray[200],
-    marginVertical: Spacing.xs,
+    marginVertical: Spacing.sm,
   },
   tripsContainer: {
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   tripCard: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     ...Shadows.sm,
   },
-  tripHeader: {
+  tripContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  tripStatusBadge: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
+    justifyContent: 'space-between',
   },
   tripRoute: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.sm,
-  },
-  tripLocation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
+    gap: Spacing.md,
     flex: 1,
   },
-  tripLocationText: {
+  cityBlock: {
     flex: 1,
+    gap: 2,
   },
-  tripCity: {
+  cityName: {
     fontWeight: '600',
-    marginBottom: 2,
+    fontSize: 15,
   },
   actionButtons: {
     paddingHorizontal: Spacing.lg,
-    gap: Spacing.md,
+    paddingTop: Spacing.md,
   },
   actionRow: {
     flexDirection: 'row',
@@ -1105,16 +888,16 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
   },
-  referralContainer: {
-    gap: Spacing.xs,
-    marginTop: Spacing.sm,
+  referralSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
   },
   referralCode: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: Spacing.md,
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.md,
     ...Shadows.sm,
   },
 });
