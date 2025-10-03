@@ -11,6 +11,7 @@ import {
 } from '@/translations';
 import { type LocaleValue } from '@/types/core';
 import { getLanguage, saveLanguage } from './storage';
+import * as Localization from 'expo-localization';
 
 // Global state
 let currentLocale: LocaleValue = i18nConfig.defaultLocale;
@@ -25,21 +26,47 @@ const listeners = new Set<LocaleChangeListener>();
 // ============================================================================
 
 /**
- * Initialize i18n system - loads saved language preference
+ * Get device language and extract just the language code (e.g., 'en' from 'en-US')
+ */
+function getDeviceLanguage(): LocaleValue {
+  try {
+    const deviceLocales = Localization.getLocales();
+    if (deviceLocales && deviceLocales.length > 0) {
+      // Extract language code from locale (e.g., 'en' from 'en-US')
+      const languageCode = deviceLocales[0].languageCode;
+      if (languageCode && isSupportedLocale(languageCode)) {
+        return languageCode as LocaleValue;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to get device language:', error);
+  }
+  return getFallbackLocale();
+}
+
+/**
+ * Initialize i18n system - loads saved language preference or uses device language
  */
 export async function initializeI18n(): Promise<LocaleValue> {
   if (isInitialized) return currentLocale;
 
   try {
+    // First, check if user has a saved preference
     const savedLocale = await getLanguage();
     if (savedLocale && isSupportedLocale(savedLocale)) {
       currentLocale = savedLocale;
     } else {
-      currentLocale = i18nConfig.defaultLocale;
+      // No saved preference, use device language with fallback to 'en'
+      currentLocale = getDeviceLanguage();
+      // Save the detected language as the user's preference
+      await saveLanguage(currentLocale);
     }
   } catch (error) {
-    console.warn('Failed to load saved language, using default:', error);
-    currentLocale = i18nConfig.defaultLocale;
+    console.warn(
+      'Failed to load saved language, using device language:',
+      error
+    );
+    currentLocale = getDeviceLanguage();
   }
 
   isInitialized = true;
