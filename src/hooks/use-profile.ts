@@ -13,7 +13,7 @@ import {
   isAuthenticated,
 } from '@/types';
 import { deleteProfileAvatar, getProfile, updateProfile } from '@/api/profile';
-import { useAuthHook } from './use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 import { APIError } from '@/api/errors';
 
 // ============================================================================
@@ -33,14 +33,14 @@ export const profileKeys = {
  * Extract authenticated user data from auth state
  */
 const useAuthUser = () => {
-  const { authState, updateUserAttributes } = useAuthHook();
+  const { state: authState, actions } = useAuth();
 
   if (!isAuthenticated(authState)) {
     return {
       token: undefined,
       userId: undefined,
       user: undefined,
-      updateUserAttributes,
+      updateUserAttributes: actions.updateUserAttributes,
     };
   }
 
@@ -48,7 +48,7 @@ const useAuthUser = () => {
     token: authState.token,
     userId: authState.user.id,
     user: authState.user,
-    updateUserAttributes,
+    updateUserAttributes: actions.updateUserAttributes,
   };
 };
 
