@@ -18,6 +18,8 @@ import {
   IconSymbol,
 } from '@/components/ui';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
+import type { DeepPartial, UserAttributes } from '@/types';
+import { EditableField, EditableSection } from '@/components/profile/';
 import React, { useCallback, useState } from 'react';
 import { Trip, isAuthenticated } from '@/types';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -25,6 +27,7 @@ import {
   useDeleteAvatar,
   useProfile,
   useUpdateAvatar,
+  useUpdateProfile,
 } from '@/hooks/use-profile';
 
 import { ThemedView } from '@/components/themed-view';
@@ -172,6 +175,7 @@ export default function ProfileScreen() {
 
   const updateAvatarMutation = useUpdateAvatar();
   const deleteAvatarMutation = useDeleteAvatar();
+  const updateProfileMutation = useUpdateProfile();
 
   const profile = profileData?.data;
 
@@ -313,9 +317,22 @@ export default function ProfileScreen() {
     handleDeleteAvatar,
   ]);
 
-  const handleEditPress = useCallback(() => {
-    router.push('/profile/edit');
+  const handleSettingsPress = useCallback(() => {
+    router.push('/profile/settings');
   }, []);
+
+  const handleFieldUpdate = useCallback(
+    async (field: keyof UserAttributes, value: string) => {
+      if (!id) return;
+
+      const updates: DeepPartial<UserAttributes> = {
+        [field]: value,
+      };
+
+      await updateProfileMutation.mutateAsync({ id, data: updates });
+    },
+    [id, updateProfileMutation]
+  );
 
   const handleTripPress = useCallback((trip: Trip) => {
     // TODO: Navigate to trip details instead of alert
@@ -410,53 +427,6 @@ export default function ProfileScreen() {
     },
   ];
 
-  const infoItems = [
-    {
-      icon: 'envelope.fill' as const,
-      label: t('profile.email') || 'Email',
-      value: profile.attributes.email,
-      visible: isOwnProfile && profile.attributes.email,
-    },
-    {
-      icon: 'phone.fill' as const,
-      label: t('profile.phone') || 'Phone',
-      value:
-        profile.attributes.phone_number || t('profile.notSet') || 'Not set',
-      visible: isOwnProfile || profile.attributes.phone_number,
-    },
-    {
-      icon: 'location.fill' as const,
-      label: t('profile.country') || 'Country',
-      value: profile.attributes.country || t('profile.notSet') || 'Not set',
-      visible: true,
-    },
-    {
-      icon: 'calendar' as const,
-      label: t('profile.memberSince') || 'Member Since',
-      value: profile.attributes.member_since
-        ? formatDate(profile.attributes.member_since, language)
-        : '-',
-      visible: true,
-    },
-    {
-      icon: 'gift.fill' as const,
-      label: t('profile.birthday') || 'Birthday',
-      value: profile.attributes.birthday
-        ? formatDate(profile.attributes.birthday, language)
-        : t('profile.notSet') || 'Not set',
-      visible: isOwnProfile,
-    },
-    {
-      icon: 'person.2.fill' as const,
-      label: t('profile.referrals') || 'Referrals',
-      value: `${profile.attributes.referred_users_count || 0} ${
-        t('profile.users') || 'users'
-      }`,
-      visible:
-        isOwnProfile && profile.attributes.referred_users_count !== undefined,
-    },
-  ].filter((item) => item.visible);
-
   const verificationBadges = [];
   if (profile.attributes.is_verified) {
     verificationBadges.push({
@@ -474,7 +444,6 @@ export default function ProfileScreen() {
   }
 
   const displayAvatar = optimisticAvatar || profile.attributes.avatar_url;
-  const bio = profile.attributes.bio || t('profile.noBio') || 'No bio yet';
 
   // ============================================================================
   // MAIN RENDER
@@ -497,12 +466,12 @@ export default function ProfileScreen() {
         rightElement={
           isOwnProfile ? (
             <Pressable
-              onPress={handleEditPress}
+              onPress={handleSettingsPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Edit"
+              accessibilityLabel="Settings"
               accessibilityRole="button"
             >
-              <IconSymbol name="pencil" size={24} color={textColor} />
+              <IconSymbol name="gearshape.fill" size={24} color={textColor} />
             </Pressable>
           ) : undefined
         }
@@ -625,81 +594,157 @@ export default function ProfileScreen() {
 
       {/* Bio Section */}
       <ThemedView style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Heading4 style={{ color: textColor }}>
-            {t('profile.bio') || 'Bio'}
-          </Heading4>
-          {isOwnProfile && (
-            <Pressable
-              onPress={handleEditPress}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Edit bio"
-              accessibilityRole="button"
-            >
-              <IconSymbol name="pencil" size={18} color={Colors.primary} />
-            </Pressable>
-          )}
-        </View>
         <View
           style={[
             styles.card,
             { backgroundColor: Colors[colorScheme].backgroundSecondary },
           ]}
         >
-          <BodySmall style={[styles.bioText, { color: textColor }]}>
-            {bio}
-          </BodySmall>
+          <EditableField
+            label={t('profile.bio') || 'Bio'}
+            value={profile.attributes.bio || ''}
+            onSave={(value) => handleFieldUpdate('bio', value)}
+            placeholder={
+              t('profile.bioPlaceholder') || 'Tell us about yourself'
+            }
+            editable={isOwnProfile}
+            multiline
+            numberOfLines={4}
+          />
         </View>
       </ThemedView>
 
       {/* Info Section */}
       <ThemedView style={styles.section}>
-        <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
-          {t('profile.information') || 'Information'}
-        </Heading4>
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: Colors[colorScheme].backgroundSecondary },
-          ]}
+        <EditableSection
+          title={t('profile.information') || 'Information'}
+          editable={isOwnProfile}
         >
-          {infoItems.map((item, index) => (
+          {(isEditMode) => (
             <View
-              key={index}
               style={[
-                styles.infoRow,
-                index < infoItems.length - 1 && {
-                  borderBottomWidth: Math.max(StyleSheet.hairlineWidth, 0.5),
-                  borderBottomColor: Colors[colorScheme].border,
-                },
+                styles.card,
+                { backgroundColor: Colors[colorScheme].backgroundSecondary },
               ]}
             >
-              <View style={styles.infoLeft}>
-                <View
-                  style={[
-                    styles.infoIconBg,
-                    { backgroundColor: Colors[colorScheme].background },
-                  ]}
-                >
-                  <IconSymbol
-                    name={item.icon}
-                    size={18}
-                    color={Colors.neutral.gray[500]}
+              {/* First Name */}
+              <EditableField
+                label={t('profile.firstName') || 'First Name'}
+                value={profile.attributes.first_name || ''}
+                onSave={(value) => handleFieldUpdate('first_name', value)}
+                placeholder={
+                  t('profile.firstNamePlaceholder') || 'Enter first name'
+                }
+                editable={isEditMode}
+                autoCapitalize="words"
+                rules={{
+                  required:
+                    t('validation.firstNameRequired') ||
+                    'First name is required',
+                  minLength: {
+                    value: 2,
+                    message:
+                      t('validation.firstNameMinLength') ||
+                      'Minimum 2 characters',
+                  },
+                }}
+              />
+              <View style={styles.divider} />
+
+              {/* Last Name */}
+              <EditableField
+                label={t('profile.lastName') || 'Last Name'}
+                value={profile.attributes.last_name || ''}
+                onSave={(value) => handleFieldUpdate('last_name', value)}
+                placeholder={
+                  t('profile.lastNamePlaceholder') || 'Enter last name'
+                }
+                editable={isEditMode}
+                autoCapitalize="words"
+                rules={{
+                  required:
+                    t('validation.lastNameRequired') || 'Last name is required',
+                  minLength: {
+                    value: 2,
+                    message:
+                      t('validation.lastNameMinLength') ||
+                      'Minimum 2 characters',
+                  },
+                }}
+              />
+              <View style={styles.divider} />
+
+              {/* Phone */}
+              {(isOwnProfile || profile.attributes.phone_number) && (
+                <>
+                  <EditableField
+                    label={t('profile.phone') || 'Phone'}
+                    value={profile.attributes.phone_number || ''}
+                    onSave={(value) => handleFieldUpdate('phone_number', value)}
+                    placeholder={
+                      t('profile.phonePlaceholder') || 'Enter phone number'
+                    }
+                    editable={isEditMode}
+                    keyboardType="phone-pad"
+                    rules={{
+                      pattern: {
+                        value:
+                          /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
+                        message:
+                          t('validation.phoneInvalid') ||
+                          'Invalid phone number',
+                      },
+                    }}
                   />
-                </View>
-                <BodySmall style={[styles.infoLabel, { color: textColor }]}>
-                  {item.label}
-                </BodySmall>
-              </View>
-              <BodySmall
-                style={[styles.infoValue, { color: textColor }]}
-                numberOfLines={1}
-              >
-                {item.value}
-              </BodySmall>
+                  <View style={styles.divider} />
+                </>
+              )}
+
+              {/* Country */}
+              <EditableField
+                label={t('profile.country') || 'Country'}
+                value={profile.attributes.country || ''}
+                onSave={(value) => handleFieldUpdate('country', value)}
+                placeholder={t('profile.countryPlaceholder') || 'Enter country'}
+                editable={isEditMode}
+                autoCapitalize="words"
+                rules={{
+                  required:
+                    t('validation.countryRequired') || 'Country is required',
+                }}
+              />
+              <View style={styles.divider} />
+
+              {/* Member Since - Read Only */}
+              <EditableField
+                label={t('profile.memberSince') || 'Member Since'}
+                value={
+                  profile.attributes.member_since
+                    ? formatDate(profile.attributes.member_since, language)
+                    : '-'
+                }
+                onSave={async () => {}}
+                editable={false}
+              />
+
+              {/* Referrals - Read Only */}
+              {isOwnProfile &&
+                profile.attributes.referred_users_count !== undefined && (
+                  <>
+                    <View style={styles.divider} />
+                    <EditableField
+                      label={t('profile.referrals') || 'Referrals'}
+                      value={`${profile.attributes.referred_users_count || 0} ${
+                        t('profile.users') || 'users'
+                      }`}
+                      onSave={async () => {}}
+                      editable={false}
+                    />
+                  </>
+                )}
             </View>
-          ))}
-        </View>
+          )}
+        </EditableSection>
       </ThemedView>
 
       {/* Upcoming Trips */}
@@ -827,9 +872,6 @@ export default function ProfileScreen() {
           </View>
         ) : (
           <>
-            <Button variant="primary" onPress={handleEditPress}>
-              {t('profile.editProfile') || 'Edit Profile'}
-            </Button>
             {profile.attributes.referral_code && (
               <View style={styles.referralContainer}>
                 <BodySmall style={{ color: textColor, opacity: 0.7 }}>
@@ -1009,38 +1051,10 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     ...Shadows.sm,
   },
-  bioText: {
-    lineHeight: 22,
-    opacity: 0.8,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-  },
-  infoLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    flex: 1,
-  },
-  infoIconBg: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  infoLabel: {
-    opacity: 0.7,
-    flex: 1,
-  },
-  infoValue: {
-    fontWeight: '600',
-    maxWidth: '45%',
-    textAlign: 'right',
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.neutral.gray[200],
+    marginVertical: Spacing.xs,
   },
   tripsContainer: {
     gap: Spacing.md,
