@@ -515,8 +515,8 @@ export interface Review {
 
 export interface ReviewAttributes {
   readonly rating: number;
-  readonly comment: string | null;
-  readonly helpful_count: number;
+  readonly text: string | null;
+  readonly votes_count: number;
   readonly vote_count: number;
   readonly created_at: string;
   readonly updated_at: string;
