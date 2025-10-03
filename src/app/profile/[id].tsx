@@ -18,7 +18,7 @@ import {
   IconSymbol,
 } from '@/components/ui';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/theme';
-import type { DeepPartial, UserAttributes } from '@/types';
+import type { DeepPartial, EntityId, UserAttributes, UserId } from '@/types';
 import { EditableField, EditableSection } from '@/components/profile/';
 import React, { useCallback, useState } from 'react';
 import { Trip, isAuthenticated } from '@/types';
@@ -29,6 +29,7 @@ import {
   useUpdateAvatar,
   useUpdateProfile,
 } from '@/hooks/use-profile';
+import { useProfileReviews, useVoteOnReview } from '@/hooks/use-reviews';
 
 import { ThemedView } from '@/components/themed-view';
 import { extractRelationshipData } from '@/utils/json-api';
@@ -142,6 +143,9 @@ export default function ProfileScreen() {
 
   const profile = profileData?.data;
 
+  const { data: reviewsData } = useProfileReviews(id as UserId);
+  const voteOnReviewMutation = useVoteOnReview(id as UserId);
+
   const upcomingTrips =
     profile?.relationships?.trips?.data && profileData?.included
       ? extractRelationshipData<Trip>(
@@ -150,6 +154,13 @@ export default function ProfileScreen() {
           'trip'
         ).slice(0, 3)
       : [];
+
+  const reviews = reviewsData?.data
+    ? [...reviewsData.data].sort((a, b) => {
+        // Sort by helpful count (vote_count) descending
+        return b.attributes.vote_count - a.attributes.vote_count;
+      })
+    : [];
 
   const handleImagePick = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -311,6 +322,17 @@ export default function ProfileScreen() {
       ]
     );
   }, [profile, t]);
+
+  const handleVoteReview = useCallback(
+    async (reviewId: EntityId) => {
+      try {
+        await voteOnReviewMutation.mutateAsync(reviewId);
+      } catch (error) {
+        console.error('Error voting on review:', error);
+      }
+    },
+    [voteOnReviewMutation]
+  );
 
   if (isLoading || !profile) {
     return (
@@ -677,6 +699,80 @@ export default function ProfileScreen() {
         </ThemedView>
       )}
 
+      {/* Reviews */}
+      {reviews.length > 0 && (
+        <ThemedView style={styles.section}>
+          <Heading4 style={[styles.sectionTitle, { color: textColor }]}>
+            {t('profile.reviews') || 'Reviews'}
+          </Heading4>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.reviewsScrollContent}
+            style={styles.reviewsScroll}
+          >
+            {reviews.map((review) => (
+              <View
+                key={review.id}
+                style={[
+                  styles.reviewCard,
+                  { backgroundColor: Colors[colorScheme].backgroundSecondary },
+                ]}
+              >
+                <View style={styles.reviewHeader}>
+                  <View style={styles.ratingContainer}>
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <IconSymbol
+                        key={index}
+                        name={
+                          index < review.attributes.rating
+                            ? 'star.fill'
+                            : 'star'
+                        }
+                        size={14}
+                        color={
+                          index < review.attributes.rating
+                            ? Colors.warning
+                            : Colors.neutral.gray[300]
+                        }
+                      />
+                    ))}
+                  </View>
+                  <Caption style={{ color: Colors.neutral.gray[500] }}>
+                    {formatShortDate(review.attributes.created_at, language)}
+                  </Caption>
+                </View>
+                {review.attributes.text && (
+                  <BodySmall
+                    style={[styles.reviewComment, { color: textColor }]}
+                    numberOfLines={4}
+                  >
+                    {review.attributes.text}
+                  </BodySmall>
+                )}
+                <Pressable
+                  style={styles.helpfulButton}
+                  onPress={() => handleVoteReview(review.id)}
+                  disabled={voteOnReviewMutation.isPending}
+                  accessibilityLabel="Mark review as helpful"
+                  accessibilityRole="button"
+                >
+                  <IconSymbol
+                    name="hand.thumbsup"
+                    size={14}
+                    color={Colors.neutral.gray[500]}
+                  />
+                  <Caption style={{ color: Colors.neutral.gray[500] }}>
+                    {t('profile.helpful') || 'Helpful'} (
+                    {review.attributes.votes_count})
+                  </Caption>
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
+        </ThemedView>
+      )}
+
       {/* Action Buttons */}
       {!isOwnProfile && (
         <ThemedView style={styles.actionButtons}>
@@ -899,5 +995,39 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     ...Shadows.sm,
+  },
+  reviewsScroll: {
+    marginHorizontal: -Spacing.lg,
+  },
+  reviewsScrollContent: {
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.md,
+  },
+  reviewCard: {
+    width: 280,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    gap: Spacing.sm,
+    ...Shadows.sm,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  reviewComment: {
+    lineHeight: 20,
+  },
+  helpfulButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingTop: Spacing.xs,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.neutral.gray[200],
   },
 });
