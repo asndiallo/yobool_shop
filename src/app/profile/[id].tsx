@@ -29,7 +29,7 @@ import {
 
 import { ThemedView } from '@/components/themed-view';
 import { extractRelationshipData } from '@/utils/json-api';
-import { useAuthHook } from '@/hooks/use-auth';
+import { useAuthState } from '@/contexts/AuthContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useTranslation } from '@/hooks/use-translation';
@@ -151,7 +151,7 @@ export default function ProfileScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
-  const { authState } = useAuthHook();
+  const { state: authState } = useAuthState();
 
   // Optimistic avatar state
   const [optimisticAvatar, setOptimisticAvatar] = useState<string | null>(null);
@@ -226,7 +226,7 @@ export default function ProfileScreen() {
       setOptimisticAvatar(asset.uri);
 
       const formData = new FormData();
-      formData.append('avatar', {
+      formData.append('user[avatar]', {
         uri: asset.uri,
         type: 'image/jpeg',
         name: 'avatar.jpg',
@@ -313,7 +313,7 @@ export default function ProfileScreen() {
     handleDeleteAvatar,
   ]);
 
-  const handleSettingsPress = useCallback(() => {
+  const handleEditPress = useCallback(() => {
     router.push('/profile/edit');
   }, []);
 
@@ -497,12 +497,12 @@ export default function ProfileScreen() {
         rightElement={
           isOwnProfile ? (
             <Pressable
-              onPress={handleSettingsPress}
+              onPress={handleEditPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              accessibilityLabel="Settings"
+              accessibilityLabel="Edit"
               accessibilityRole="button"
             >
-              <IconSymbol name="gear" size={24} color={textColor} />
+              <IconSymbol name="pencil" size={24} color={textColor} />
             </Pressable>
           ) : undefined
         }
@@ -631,7 +631,7 @@ export default function ProfileScreen() {
           </Heading4>
           {isOwnProfile && (
             <Pressable
-              onPress={handleSettingsPress}
+              onPress={handleEditPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               accessibilityLabel="Edit bio"
               accessibilityRole="button"
@@ -827,7 +827,7 @@ export default function ProfileScreen() {
           </View>
         ) : (
           <>
-            <Button variant="primary" onPress={handleSettingsPress}>
+            <Button variant="primary" onPress={handleEditPress}>
               {t('profile.editProfile') || 'Edit Profile'}
             </Button>
             {profile.attributes.referral_code && (
